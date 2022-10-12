@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="360dp"
+    tools:layout_editor_absoluteX="2dp"
+    tools:layout_editor_absoluteY="-77dp">
+
+    <TextView
+        android:id="@+id/textView_prodotto_popup_chef2"
+        android:layout_width="105dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="30dp"
+        android:text="Prodotto:"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintBottom_toTopOf="@+id/button_prendi_in_carico"
+        app:layout_constraintStart_toStartOf="@+id/textView_ordine_popup_chef"
+        app:layout_constraintTop_toBottomOf="@+id/textView_ordine_popup_chef"
+        app:layout_constraintVertical_bias="0.076" />
+
+    <Button
+        android:id="@+id/button_prendi_in_carico"
+        android:layout_width="146dp"
+        android:layout_height="84dp"
+        android:layout_marginBottom="24dp"
+        android:onClick="itemWorking"
+        android:text="Prendi \nin carico"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button_completamento"
+        android:layout_width="194dp"
+        android:layout_height="87dp"
+        android:layout_marginBottom="24dp"
+        android:onClick="itemCompleted"
+        android:text="Segnala \ncompletamento"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/button_prendi_in_carico" />
+
+    <TextView
+        android:id="@+id/textView_ordine_popup_chef"
+        android:layout_width="115dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="48dp"
+        android:text="N° Ordine:"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_order_ID_popup_chef"
+        android:layout_width="40dp"
+        android:layout_height="43dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="128dp"
+        android:text="2"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.09"
+        app:layout_constraintStart_toEndOf="@+id/textView_ordine_popup_chef"
+        app:layout_constraintTop_toTopOf="@+id/textView_ordine_popup_chef" />
+
+    <TextView
+        android:id="@+id/textView_nome_prodotto_popup_chef"
+        android:layout_width="111dp"
+        android:layout_height="56dp"
+        android:text="Marghetita speciale"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.259"
+        app:layout_constraintStart_toEndOf="@+id/textView_prodotto_popup_chef2"
+        app:layout_constraintTop_toTopOf="@+id/textView_prodotto_popup_chef2" />
+</androidx.constraintlayout.widget.ConstraintLayout>
