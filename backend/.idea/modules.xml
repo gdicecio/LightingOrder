@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ProxyAccoglienza/ProxyAccoglienza.iml" filepath="$PROJECT_DIR$/ProxyAccoglienza/ProxyAccoglienza.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ProxyCameriere/ProxyCameriere.iml" filepath="$PROJECT_DIR$/ProxyCameriere/ProxyCameriere.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ProxyLogin/ProxyLogin.iml" filepath="$PROJECT_DIR$/ProxyLogin/ProxyLogin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ProxyRealizzatore/ProxyRealizzotore.iml" filepath="$PROJECT_DIR$/ProxyRealizzatore/ProxyRealizzotore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/SAD-Project-backend-code.iml" filepath="$PROJECT_DIR$/.idea/SAD-Project-backend-code.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Lighting_Order/lighting_order.iml" filepath="$PROJECT_DIR$/Lighting_Order/lighting_order.iml" />
+    </modules>
+  </component>
+</project>
