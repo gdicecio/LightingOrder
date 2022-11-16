@@ -1,6 +1,6 @@
 ======================================================= DATABASE ============================================================
 - Scaricare PostgreSQL dal sito ufficiale
-- Installare e impostare una password per l'utente amministratore
+- Installare e impostare come password "giuseppe" per l'utente amministratore
 	Oltre all'installazione del database è utile installare anche PgAdmin (basta marcare una spunta durante l'installazione)
 	PgAdmin è un'interfaccia grafica per visualizzare, modificare, creare ecc tutte le informazioni sul DB.
 - Creare un database tramite interfaccia grafica (pgAdmin). Il nome è indifferente, io l'ho chiamato "Ristorante".
