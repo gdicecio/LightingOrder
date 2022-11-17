@@ -15,10 +15,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.koushikdutta.async.http.server.AsyncHttpServer;
-import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
-import com.koushikdutta.async.http.server.AsyncHttpServerResponse;
-import com.koushikdutta.async.http.server.HttpServerRequestCallback;
 import com.lightingorder.Controller.ConnectivityController;
 import com.lightingorder.Controller.AppStateController;
 import com.lightingorder.Controller.UserSessionController;
@@ -28,7 +24,7 @@ import com.lightingorder.Model.messages.loginRequest;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText ed_user_id;
+    EditText ed_user_id, ed_user_password;
     Button b_login;
     private UserSessionController user_contr = new UserSessionController();
     private AlertDialog.Builder dialogBuilder;
@@ -37,25 +33,33 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppStateController.getApplication().setCurrent_activity(this);
         setContentView(R.layout.activity_main);
         ed_user_id = (EditText) findViewById(R.id.user_id);
+        ed_user_password = (EditText) findViewById(R.id.user_password);
         b_login = (Button) findViewById(R.id.login);
         ConnectivityController.getConnectivity().configPostMapping();
-        ConnectivityController.getConnectivity().startServer(StdTerms.server_port);
+        ConnectivityController.getConnectivity().startServer();
     }
 
     public void sendLogin(View view){
 
         user_contr.setUserID(ed_user_id.getText().toString());
+        String ipAddress = null;
 
-        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        String ipAddress = Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
+        if(!StdTerms.manual_ip_address) {
+            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+            ipAddress = Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress());
+        } else
+            ipAddress = StdTerms.ipAddress;
 
+        Log.d("myIP", ipAddress);
+        Log.d("loginIP", StdTerms.proxyLoginAddress);
         user_contr.setUserIpAddress(ipAddress+":"+(StdTerms.server_port));
         //user_contr.setUserIpAddress("192.168.42.129:5000");
         //user_contr.setUserIpAddress("192.168.1.130:5000");
 
-        ConnectivityController.sendLoginRequest(user_contr);
+        ConnectivityController.sendLoginRequest(user_contr, ed_user_password.getText().toString());
         Log.d("ACTIVITY","MAIN ACTIVITY: Login request sent");
 
         new CountDownTimer(3000, 1000) {

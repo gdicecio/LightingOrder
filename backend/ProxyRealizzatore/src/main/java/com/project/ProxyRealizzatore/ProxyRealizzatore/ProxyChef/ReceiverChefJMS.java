@@ -58,11 +58,11 @@ public class ReceiverChefJMS implements MessageListener {
 
             case "itemCompleteRequest": case "itemWorkingRequest": case "orderRequest":
                 if( Webhook.Chef.containsKey(msg_received.user)) //if the name exists
-                    poster.createPost("http://"+ Webhook.Chef.get(msg_received.user)+"/request",msg_to_send);
+                    poster.createPost("https://"+ Webhook.Chef.get(msg_received.user)+"/request",msg_to_send);
                 break;
             case "orderNotification":
             for (Map.Entry<String, String> me : Webhook.Chef.entrySet())
-                poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
+                poster.createPost("https://"+ me.getValue()+"/notification",msg_to_send);
             break;
             //adds a new user and notify
             case "registerNotification":
@@ -73,8 +73,8 @@ public class ReceiverChefJMS implements MessageListener {
                 resp.proxySource= getProxyAddress()+"/makerSend";
                 msg_to_send=gson.toJson(resp,loginResponse.class);
                 if( Webhook.Chef.containsKey(msg_received.user)) //if the name exists
-                    log.info("Sending to "+"http://" + Webhook.Chef.get(msg_received.user));
-                    poster.createPost("http://"+ Webhook.Chef.get(msg_received.user)+"/login",msg_to_send);
+                    log.info("Sending to "+"https://" + Webhook.Chef.get(msg_received.user));
+                    poster.createPost("https://"+ Webhook.Chef.get(msg_received.user)+"/login",msg_to_send);
                 break;
             default:
                 log.info("Message does not match with any of the expected ones");

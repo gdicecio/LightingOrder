@@ -1,0 +1,5 @@
+Login Request
+{"password":"giuseppe","url":"0.0.0.0:5000","messageName":"loginRequest","proxySource":"","response":"","result":"","user":"1"}
+
+Notification
+{"url":"192.168.43.1:5000","user":"1","messageName":"registerNotification","result":"Accoglienza"}

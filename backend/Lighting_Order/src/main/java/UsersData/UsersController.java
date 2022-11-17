@@ -18,7 +18,9 @@ public class UsersController {
 		UserNotFound,
 		UserFound,
 		UserNotFoundInDB,
-		UserFoundInDB
+		UserFoundInDB,
+
+		UserPasswordWrong
 	}
 	
 	public List<User> users;
@@ -31,7 +33,7 @@ public class UsersController {
 	public List<String> login(String id) {
 
 		//Caricamento preliminare se necessario
-		if(!checkUser(id)) {
+	/*	if(!checkUser(id)) {
 			UserDAOPSQL db = new UserDAOPSQL();
 			String user = db.findUserByIdJSON(id);
 
@@ -42,7 +44,7 @@ public class UsersController {
 				this.ec = ErrorCode.UserFoundInDB;
 			}
 		}
-		
+		*/
 		Optional<User> u = getUserById(id);
 		List<String> roles = null;
 		if(u.isPresent())
@@ -50,7 +52,36 @@ public class UsersController {
 		
 		return roles;
 	}
-	
+	public List<String> loginFirstTime(String id, String password) {
+		/** Funzione per caricare la prima volta un utente nel sistema
+		 * La password è necessaria solo in questo step.
+		 * Altre funzioni che vogliono controllare se l'utente abbia fatto l'accesso
+		 * non devono controllare ogni volta anche la password */
+
+		//Caricamento preliminare se necessario
+		if(!checkUser(id)) {
+			UserDAOPSQL db = new UserDAOPSQL();
+			String user = db.findUserByIdJSON(id);
+
+			if(user == null)
+				this.ec = ErrorCode.UserNotFoundInDB;
+			else {
+				String pass = db.getPasswordById(id);
+				if(pass.equals(password)){
+					setUserByJSON(user);
+					this.ec = ErrorCode.UserFoundInDB;
+				} else
+					this.ec = ErrorCode.UserPasswordWrong;
+			}
+		}
+
+		Optional<User> u = getUserById(id);
+		List<String> roles = null;
+		if(u.isPresent())
+			roles = u.get().getRoles();
+
+		return roles;
+	}
 	public void loginAll() {
 		users = new ArrayList<User>();
 		UserDAOPSQL db = new UserDAOPSQL();

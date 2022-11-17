@@ -2,7 +2,6 @@ package com.lightingorder.Controller;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -11,16 +10,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.connectivity.ClientSSL;
+import com.connectivity.HttpRequest;
+import com.connectivity.HttpResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.koushikdutta.async.http.AsyncHttpClient;
-import com.koushikdutta.async.http.AsyncHttpRequest;
-import com.koushikdutta.async.http.AsyncHttpResponse;
-import com.koushikdutta.async.http.body.StringBody;
-import com.koushikdutta.async.http.server.AsyncHttpServer;
-import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
-import com.koushikdutta.async.http.server.AsyncHttpServerResponse;
-import com.koushikdutta.async.http.server.HttpServerRequestCallback;
 import com.lightingorder.Model.Data;
 import com.lightingorder.Model.MenuAndWareHouseArea.MenuItem;
 import com.lightingorder.Model.RestaurantArea.Order;
@@ -39,6 +33,8 @@ import com.lightingorder.R;
 import com.lightingorder.StdTerms;
 import com.lightingorder.View.MakerActivity;
 import com.lightingorder.View.TableActivity;
+import com.connectivity.HttpResponseCallback;
+import com.connectivity.ServerSSL;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,14 +44,19 @@ import java.util.List;
 
 public class ConnectivityController {   //Singleton
     private static ConnectivityController istanza = null;
-    private final AsyncHttpServer server = new AsyncHttpServer();
+    private final String path = "/data/data/com.lightingorder/files/certificate.p12";
+
+    private final ServerSSL myserver;
     private AlertDialog.Builder dialogBuilder;
     private AlertDialog dialog;
     private TextView testo_notifca;
     private Button vai_alla_pagina;
     private Button chiudi;
 
-    private ConnectivityController(){}
+    private ConnectivityController(){
+         myserver = new ServerSSL(StdTerms.server_port, path);
+    }
+
     public static synchronized ConnectivityController getConnectivity(){
         if(istanza == null){
             istanza = new ConnectivityController();
@@ -68,14 +69,11 @@ public class ConnectivityController {   //Singleton
         Gson gsonReq = new Gson();
         UserSessionController user_contr = new UserSessionController();
 
-        istanza.server.post("/login", new HttpServerRequestCallback() {
+        istanza.myserver.postMapping("/login", new HttpResponseCallback() {
             @Override
-            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-                //Retrieve the message body as String (in JSON format)
-                String req = request.getBody().toString();
-                //Create the object using the JSON string
+            public HttpResponse onRequest(HttpRequest request) {
+                String req = request.getBody();
                 loginRequest msg_rcvd = gsonReq.fromJson(req, loginRequest.class);
-                //Add role and relative proxy to the user session hashmap
                 user_contr.addRoleAndProxy(msg_rcvd.result,msg_rcvd.proxySource);
                 AppStateController.getApplication().getCurrent_activity().runOnUiThread(new Runnable() {
                     public void run() {
@@ -83,18 +81,18 @@ public class ConnectivityController {   //Singleton
                         t.show();
                     }
                 });
-                //Sending the response to the proxy
-                response.code(200);
-                response.send("Message received");
+                HttpResponse response = new HttpResponse();
+                response.setCode(200);
+                response.setBody("Message Received");
+                return response;
             }
         });
 
-
-        istanza.server.post("/request", new HttpServerRequestCallback() {
+        istanza.myserver.postMapping("/request", new HttpResponseCallback() {
             @Override
-            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+            public HttpResponse onRequest(HttpRequest request) {
                 //Retrieve the message body as String (in JSON format)
-                String req = request.getBody().toString();
+                String req = request.getBody();
                 //Create the object using the JSON string
                 baseMessage msg_rcvd = gsonReq.fromJson(req, baseMessage.class);
                 String message_type  = msg_rcvd.messageName;
@@ -186,8 +184,8 @@ public class ConnectivityController {   //Singleton
                         case "freeTableRequest":
                             tableOperation free_msg = gsonReq.fromJson(req, tableOperation.class);
                             Data.getData().updateTableState(free_msg.tableID,
-                                                            free_msg.tableRoomNumber,
-                                                            StdTerms.statesList.free.name());
+                                    free_msg.tableRoomNumber,
+                                    StdTerms.statesList.free.name());
                             Activity current4 = AppStateController.getApplication().getCurrent_activity();
                             if(current4.getLocalClassName().equals("View.TableActivity")){
                                 current4.finish();
@@ -201,8 +199,8 @@ public class ConnectivityController {   //Singleton
                         case "userWaitingForOrderRequest":
                             tableOperation usr_wait_msg = gsonReq.fromJson(req, tableOperation.class);
                             Data.getData().updateTableState(usr_wait_msg.tableID,
-                                                            usr_wait_msg.tableRoomNumber,
-                                                            StdTerms.statesList.waitingForOrders.name());
+                                    usr_wait_msg.tableRoomNumber,
+                                    StdTerms.statesList.waitingForOrders.name());
 
                             Activity current5 = AppStateController.getApplication().getCurrent_activity();
                             if(current5.getLocalClassName().equals("View.TableActivity")){
@@ -301,18 +299,20 @@ public class ConnectivityController {   //Singleton
                 });
 
                 //Sending the response to the proxy
-                response.code(200);
-                response.send("Message received");
+                HttpResponse response = new HttpResponse();
+                response.setCode(200);
+                response.setBody("Message received");
+                return response;
             }
         });
 
-
-        istanza.server.post("/notification", new HttpServerRequestCallback() {
+        istanza.myserver.postMapping("/notification", new HttpResponseCallback() {
             @Override
-            public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+            public HttpResponse onRequest(HttpRequest request) {
+                HttpResponse response = new HttpResponse();
                 if(user_contr.getLoginResult()) {
                     //Retrieve the message body as String (in JSON format)
-                    String req = request.getBody().toString();
+                    String req = request.getBody();
                     //Create the object using the JSON string
                     baseMessage msg_rcvd = gsonReq.fromJson(req, baseMessage.class);
                     String message_type = msg_rcvd.messageName;
@@ -379,26 +379,62 @@ public class ConnectivityController {   //Singleton
                     }
 
                     //Sending the response to the proxy
-                    response.code(200);
-                    response.send("Message received");
+
+                    response.setCode(200);
+                    response.setBody("Message received");
                 }
                 else {
                     //Sending the response to the proxy
-                    response.code(503);
-                    response.send("User not logged yet");
+                    response.setCode(500);
+                    response.setBody("User not logged yet");
                 }
+                return response;
             }
         });
 
     }
 
 
-    public void startServer(int port){
-        istanza.server.listen(port);
+    public void startServer(){
+        istanza.myserver.listen();
     }
 
 
+    //"192.168.43.16:8085/loginSend";
+    static private void sendPost(String body, String urlDestination){
+        ClientSSL client = new ClientSSL("my_certificate.crt", AppStateController.getApplication().getCurrent_activity().getFilesDir().toString());
 
+        String address_and_port = urlDestination.split("/")[0];
+        String path = urlDestination.split("/")[1];
+        String address = address_and_port.split(":")[0];
+        int port = Integer.valueOf(address_and_port.split(":")[1]);
+        Log.d("Client",  "[Address]: "+ address);
+        Log.d("Client",  "[Port]: "+ port);
+        Log.d("Client",  "[Address]: "+ path);
+        HttpRequest req = new HttpRequest(address, port, "/"+path);
+        req.setMethod("POST");
+        req.setHeader("Content-Length", ""+body.length());
+        req.setHeader("Content-Type", "application/json");
+        req.setHeader("User-Agent", "Android Frontend");
+        req.setHeader("Accept", "*/*");
+        req.setHeader("Connection", "keep-alive");
+        req.setHeader("Host", address_and_port);
+        req.setBody(body);
+
+        HttpResponse res = client.send(req);
+        if(res!=null){
+        if(res.getCode() == 200)
+            Log.d("PROXY","Proxy received your message");
+        else
+            Log.d("PROXY","There were problems contacting the Proxy");
+
+        AppStateController.getApplication().setProxyConnectionState(res.getCode());}
+        else
+            AppStateController.getApplication().setProxyConnectionState(-1);
+        Log.d("Login Response", res.getBody());
+
+    }
+/*
     static private void sendPost(String body, String urlDestination){
 
         //POST Request whit String Body
@@ -430,12 +466,15 @@ public class ConnectivityController {   //Singleton
             ex.printStackTrace();
         }
     }
+*/
+    public static void sendLoginRequest(UserSessionController us_contr, String password){
+        //Perchè non mettere la password nella struttura dati dell'utente?
+        //La risposta è che la password deve solo inviata per l'accesso, non serve memorizzarla per tutta la sessione.
 
-
-    public static void sendLoginRequest(UserSessionController us_contr){
         //Body of my request ---> request type = loginRequest
         loginRequest req_body = new loginRequest(
                 us_contr.getUserID(), //user
+                password,
                 "", //proxySource
                 StdTerms.messages.loginRequest.name(),  //messageName
                 "",     //result
@@ -445,10 +484,10 @@ public class ConnectivityController {   //Singleton
         //Convert into string and send Post request
         Gson gson = new Gson();
         String msg_body = gson.toJson(req_body);
+        Log.d("Login", msg_body);
         ConnectivityController.sendPost(msg_body, StdTerms.proxyLoginAddress);
 
     }
-
 
     public static void sendMenuRequest(UserSessionController us_contr, String proxy_addr){
         menuRequest req_body = new menuRequest(
@@ -463,7 +502,6 @@ public class ConnectivityController {   //Singleton
         String msg_body = gson.toJson(req_body);
         ConnectivityController.sendPost(msg_body, proxy_addr);
     }
-
 
     public static void sendTableRequest(UserSessionController us_contr, String proxy_addr){
 
@@ -491,7 +529,6 @@ public class ConnectivityController {   //Singleton
         ConnectivityController.sendPost(msg_body, proxy_addr);
     }
 
-
     public static void sendTableOperationRequest(UserSessionController us_contr, String proxy_addr,
                                                  String tableID, int tableRoom, String new_state){
 
@@ -516,7 +553,6 @@ public class ConnectivityController {   //Singleton
         ConnectivityController.sendPost(msg_body,proxy_addr);
     }
 
-
     public static void sendOrderRequest(UserSessionController us_contr, String proxy_addr, String area){
 
 
@@ -532,7 +568,6 @@ public class ConnectivityController {   //Singleton
         String msg_body = gson.toJson(req_body);
         ConnectivityController.sendPost(msg_body,proxy_addr);
     }
-
 
     public static void sendAddOrderToTableRequest(UserSessionController us_contr,
                                                   String proxy_addr, String tableID, int roomNumber,
@@ -560,7 +595,6 @@ public class ConnectivityController {   //Singleton
 
     }
 
-
     public static void sendCancelOrderRequest(UserSessionController us_contr, String proxy_addr, int orderID){
 
         Gson gson = new Gson();
@@ -574,7 +608,6 @@ public class ConnectivityController {   //Singleton
         String msg_body = gson.toJson(req_body);
         ConnectivityController.sendPost(msg_body,proxy_addr);
     }
-
 
     public static void sendCancelOrderedItemRequest(UserSessionController us_contr, String proxy_addr,
                                                     int orderID, int lineNumber){
@@ -593,7 +626,6 @@ public class ConnectivityController {   //Singleton
 
     }
 
-
     public static void sendItemCompletedRequest(UserSessionController us_contr, String proxy_addr,
                                                 int orderID, int lineNumber){
 
@@ -611,7 +643,6 @@ public class ConnectivityController {   //Singleton
 
     }
 
-
     public static void sendItemWorkingRequest(UserSessionController us_contr, String proxy_addr,
                                                 int orderID, int lineNumber){
 
@@ -627,7 +658,6 @@ public class ConnectivityController {   //Singleton
         String msg_body = gson.toJson(req_body);
         ConnectivityController.sendPost(msg_body,proxy_addr);
     }
-
 
     private void createNotificationPopup(String notificationTxt, String notificationType, String tableID, int roomNumber, String area){
 
@@ -671,7 +701,6 @@ public class ConnectivityController {   //Singleton
 
     }
 
-
     public void createWaiterNotificationPopup(String notificationTxt, String notificationType, String tableID, int roomNumber){
         createNotificationPopup(notificationTxt, notificationType, tableID, roomNumber, null);
     }
@@ -679,7 +708,6 @@ public class ConnectivityController {   //Singleton
     public void createMakerNotificationPopup(String notificationTxt, String notificationType, String area ){
         createNotificationPopup(notificationTxt, notificationType, null , 0, area);
     }
-
 
     private void goToTablePage(String tableID, int tableRoomNumber){
 
@@ -720,7 +748,6 @@ public class ConnectivityController {   //Singleton
         sendOrderRequest(us_contr,us_contr.getCurrentProxy(),area);
         dialog.dismiss();
     }
-
 
     private void close(View view){
         Log.d("POPUP", "Tasto close cliccato");

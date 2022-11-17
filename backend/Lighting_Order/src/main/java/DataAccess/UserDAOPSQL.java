@@ -82,6 +82,18 @@ public class UserDAOPSQL implements UsersDAO {
 		return to_return;
 	}
 
+	public String getPasswordById(String id){
+		String to_return = "";
+		String query = "SELECT password FROM \"Restaurant\".\"Dipendente\" "
+				+ "WHERE id = '"+ id + "'";
+		List<Map<String,Object>> results = database.queryForList(query);
+		if( results.size() > 0) {
+			to_return = results.get(0).get("password").toString();
+		} else {
+			to_return = null;
+		}
+		return to_return;
+	}
 	@Override
 	public int numberOfUsers() {
 		int to_return = 0;

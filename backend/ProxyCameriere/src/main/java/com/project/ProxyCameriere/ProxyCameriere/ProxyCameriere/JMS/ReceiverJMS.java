@@ -72,14 +72,14 @@ public class ReceiverJMS implements MessageListener {
             //In the case a client is waiting for ordination
              case "userWaitingNotification" :
                 for (Map.Entry<String, String> me : Webhook.Waiters.entrySet()) {
-                     poster.createPost("http://"+ me.getValue()+"/notification",msg_to_send);
+                     poster.createPost("https://"+ me.getValue()+"/notification",msg_to_send);
                 }
                 break;
             //Just a confirmation message to the event creator
             case "menuRequest" : case "cancelOrderedItemRequest" : case "orderToTableGenerationRequest" :
                 case "cancelOrderRequest" : case "tableRequest":
                     if(Webhook.Waiters.containsKey(msg_received.user)) {
-                        poster.createPost("http://" + Webhook.Waiters.get(msg_received.user) + "/request", msg_to_send);
+                        poster.createPost("https://" + Webhook.Waiters.get(msg_received.user) + "/request", msg_to_send);
                         log.info(msg_to_send);
                     }
                     break;
@@ -91,8 +91,8 @@ public class ReceiverJMS implements MessageListener {
                 resp.proxySource= getProxyAddress()+"/waitersSend";
                 msg_to_send=gson.toJson(resp,loginResponse.class);
                 if( Webhook.Waiters.containsKey(msg_received.user)) { //if the name exists
-                        log.info("Sending to "+"http://" + Webhook.Waiters.get(msg_received.user));
-                        poster.createPost("http://" + Webhook.Waiters.get(msg_received.user) + "/login", msg_to_send);
+                        log.info("Sending to "+"https://" + Webhook.Waiters.get(msg_received.user));
+                        poster.createPost("https://" + Webhook.Waiters.get(msg_received.user) + "/login", msg_to_send);
                   }
                 break;
             default :

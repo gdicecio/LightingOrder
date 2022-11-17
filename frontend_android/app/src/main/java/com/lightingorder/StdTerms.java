@@ -15,7 +15,9 @@ public class StdTerms {
     public static final int orange = Color.rgb(255, 102, 0);
     public static final int purple = Color.rgb(102, 0, 204);
 
-    public static final String proxyLoginAddress = "192.168.1.111:8085/loginSend";
+    public static final boolean manual_ip_address = false;
+    public static final String ipAddress = "192.168.43.1";
+    public static final String proxyLoginAddress = "192.168.1.104:8085/loginSend";
    // public static final String proxyLoginAddress = "192.168.1.115:8085/loginSend";
     public static final int server_port = 5000;
 

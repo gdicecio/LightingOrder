@@ -567,9 +567,9 @@ public class SystemController  extends GeneralController implements controllerIf
 	public void loginRequest(String request) {
 		// TODO Auto-generated method stub
 		Gson gson=new Gson();
-		loginRequest obj=gson.fromJson(request, loginRequest.class);
+		loginRequest obj = gson.fromJson(request, loginRequest.class);
 		List<loginRequest> notifications=new ArrayList<>();
-		List<String>roles=this.usersController.login(obj.user);
+		List<String>roles=this.usersController.loginFirstTime(obj.user, obj.password);
 		JsonArray array=new JsonArray();
 		for(String role : roles) {
 			notifications.add(generateRegisterNotification(obj.user,obj.url,role));

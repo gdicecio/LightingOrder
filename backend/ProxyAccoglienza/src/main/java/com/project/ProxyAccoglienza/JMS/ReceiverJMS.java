@@ -66,7 +66,7 @@ public class ReceiverJMS implements MessageListener {
             //Semplici messaggi di conferma che vanno al singolo
             case "tableRequest" : case "userWaitingForOrderRequest": case "freeTableRequest":
                 if(Webhook.Acceptance.containsKey(msg_received.user))
-                    poster.createPost("http://"+ Webhook.Acceptance.get(msg_received.user)+"/request",msg_to_send);
+                    poster.createPost("https://"+ Webhook.Acceptance.get(msg_received.user)+"/request",msg_to_send);
                 break;
             //adds a new user and notify
             case "registerNotification":
@@ -74,12 +74,12 @@ public class ReceiverJMS implements MessageListener {
                 Webhook.Add_Acceptance(resp.user,resp.url);
                 log.info("Added user "+resp.user+" with url : "+resp.url);
 
-                //NNow set the url to post
+                //Now set the url to post
                 resp.proxySource= getProxyAddress()+"/acceptanceSend";
                 msg_to_send=gson.toJson(resp, loginRequest.class);
                 if( Webhook.Acceptance.containsKey(msg_received.user)) //if the name exists
-                    log.info("Sending to "+"http://" + Webhook.Acceptance.get(msg_received.user));
-                    poster.createPost("http://"+ Webhook.Acceptance.get(msg_received.user)+"/login",msg_to_send);
+                    log.info("Sending to "+"https://" + Webhook.Acceptance.get(msg_received.user));
+                    poster.createPost("https://"+ Webhook.Acceptance.get(msg_received.user)+"/login",msg_to_send);
                 break;
             default:
                 log.info("Message does not match with any of the expected ones");
