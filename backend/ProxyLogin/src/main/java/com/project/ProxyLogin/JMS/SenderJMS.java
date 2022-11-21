@@ -15,7 +15,11 @@ public class SenderJMS {
         private String JmsQueue;
 
         public void sendMessage (String order) {
+
+                //IMplementare codice per keycloak
             JmsTemp.convertAndSend(JmsQueue, order);
+
+            //Ritorna Access Token e Refresh o null
         }
 }
 

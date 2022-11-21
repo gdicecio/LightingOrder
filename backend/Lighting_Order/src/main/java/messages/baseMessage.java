@@ -5,4 +5,6 @@ public class baseMessage {
 	public String messageName;
 	public String result;
 	public String response;
+
+	//aggiungere access token
 }

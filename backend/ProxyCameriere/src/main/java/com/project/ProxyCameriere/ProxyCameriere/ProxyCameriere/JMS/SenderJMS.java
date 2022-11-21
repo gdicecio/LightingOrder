@@ -18,6 +18,8 @@ public class SenderJMS {
          * Da testare come il sender invia oggetti JSON
          */
         public void sendMessage (String order) {
+
+                //Controllo sul token
             JmsTemp.convertAndSend(JmsQueue, order);
         }
 }
