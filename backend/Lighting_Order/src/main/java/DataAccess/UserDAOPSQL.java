@@ -15,12 +15,17 @@ public class UserDAOPSQL implements UsersDAO {
 	
 	
 	private JdbcTemplate database;
-	
+
 	public static final String DRIVER = "org.postgresql.Driver";
-    public static final String JDBC_URL = "jdbc:postgresql://localhost:5432/Ristorante";
-    public static final String USERNAME = "postgres";
-    public static final String PASSWORD = "giuseppe";
-	
+	public static final String JDBC_URL = "jdbc:postgresql://ssd-lightingorder1.cffteivxlgpu.eu-central-1.rds.amazonaws.com:5432/Ristorante1926?" +
+			"sslmode=verify-full&" +
+			"sslrootcert=C:/Users/giuse/OneDrive/Desktop/Universita/SSD/Progetto/certs/AWS Certs/eu-central-1-bundle.pem";
+	/*
+	 * USER & PASS da inserire
+	*/
+	public static final String USERNAME = "Username...";
+	public static final String PASSWORD = "Password...";
+
 	public UserDAOPSQL() {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(UserDAOPSQL.DRIVER);
