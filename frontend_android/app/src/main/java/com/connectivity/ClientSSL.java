@@ -14,6 +14,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
@@ -26,6 +28,7 @@ public class ClientSSL {
     String certificate_path;
     String certificate_name;
     ClientThread client;
+    int timeout;
     private String files_dir = "/data/user/0/com.example.server_https/files";
 
     public ClientSSL() {
@@ -77,7 +80,9 @@ public class ClientSSL {
         client.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, req); //Esecuzione parallela
         Log.d("Client", "Request sent");
         try {
-            res = client.get();
+            res = client.get(timeout, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException e){
+            ConnectionErrors.hystory_errors.add(ConnectionErrors.Error.ClientTimeout.name());
         } catch (Exception e) {
             ConnectionErrors.hystory_errors.add(ConnectionErrors.Error.ExecutionClient.name());
         }
@@ -127,5 +132,9 @@ public class ClientSSL {
         }
 
         return sf;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 }

@@ -41,6 +41,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ConnectivityController {   //Singleton
     private static ConnectivityController istanza = null;
@@ -401,9 +402,9 @@ public class ConnectivityController {   //Singleton
 
 
     //"192.168.43.16:8085/loginSend";
-    static private void sendPost(String body, String urlDestination){
+    static private HttpResponse sendPost(String body, String urlDestination){
         ClientSSL client = new ClientSSL("my_certificate.crt", AppStateController.getApplication().getCurrent_activity().getFilesDir().toString());
-
+        client.setTimeout(5000);
         String address_and_port = urlDestination.split("/")[0];
         String path = urlDestination.split("/")[1];
         String address = address_and_port.split(":")[0];
@@ -419,20 +420,20 @@ public class ConnectivityController {   //Singleton
         req.setHeader("Accept", "*/*");
         req.setHeader("Connection", "keep-alive");
         req.setHeader("Host", address_and_port);
+        if(StdTerms.access_token != " ")
+            req.setHeader("Authorization", StdTerms.type_token.toLowerCase() + " " + StdTerms.access_token);
         req.setBody(body);
 
         HttpResponse res = client.send(req);
-        if(res!=null){
-        if(res.getCode() == 200)
-            Log.d("PROXY","Proxy received your message");
-        else
-            Log.d("PROXY","There were problems contacting the Proxy");
-
-        AppStateController.getApplication().setProxyConnectionState(res.getCode());}
-        else
+        if(res!=null) {
+            AppStateController.getApplication().setProxyConnectionState(res.getCode());
+            Log.d("Login Response", res.getBody());
+        }
+        else {
+            res = new HttpResponse();
             AppStateController.getApplication().setProxyConnectionState(-1);
-        Log.d("Login Response", res.getBody());
-
+        }
+        return res;
     }
 /*
     static private void sendPost(String body, String urlDestination){
@@ -467,7 +468,7 @@ public class ConnectivityController {   //Singleton
         }
     }
 */
-    public static void sendLoginRequest(UserSessionController us_contr, String password){
+    public static HttpResponse sendLoginRequest(UserSessionController us_contr, String password){
         //Perchè non mettere la password nella struttura dati dell'utente?
         //La risposta è che la password deve solo inviata per l'accesso, non serve memorizzarla per tutta la sessione.
 
@@ -485,11 +486,11 @@ public class ConnectivityController {   //Singleton
         Gson gson = new Gson();
         String msg_body = gson.toJson(req_body);
         Log.d("Login", msg_body);
-        ConnectivityController.sendPost(msg_body, StdTerms.proxyLoginAddress);
+        return ConnectivityController.sendPost(msg_body, StdTerms.proxyLoginAddress);
 
     }
 
-    public static void sendMenuRequest(UserSessionController us_contr, String proxy_addr){
+    public static HttpResponse sendMenuRequest(UserSessionController us_contr, String proxy_addr){
         menuRequest req_body = new menuRequest(
                 us_contr.getUserID(),
                 "",
@@ -500,10 +501,10 @@ public class ConnectivityController {   //Singleton
                 "" );
         Gson gson = new Gson();
         String msg_body = gson.toJson(req_body);
-        ConnectivityController.sendPost(msg_body, proxy_addr);
+        return ConnectivityController.sendPost(msg_body, proxy_addr);
     }
 
-    public static void sendTableRequest(UserSessionController us_contr, String proxy_addr){
+    public static HttpResponse sendTableRequest(UserSessionController us_contr, String proxy_addr){
 
         String proxy_name = "";
         if(us_contr.getCurrentRole().equals(StdTerms.roles.Cameriere.name()))
@@ -526,7 +527,7 @@ public class ConnectivityController {   //Singleton
         //Convert into string and send Post request
         Gson gson = new Gson();
         String msg_body = gson.toJson(req_body);
-        ConnectivityController.sendPost(msg_body, proxy_addr);
+        return ConnectivityController.sendPost(msg_body, proxy_addr);
     }
 
     public static void sendTableOperationRequest(UserSessionController us_contr, String proxy_addr,
@@ -553,7 +554,7 @@ public class ConnectivityController {   //Singleton
         ConnectivityController.sendPost(msg_body,proxy_addr);
     }
 
-    public static void sendOrderRequest(UserSessionController us_contr, String proxy_addr, String area){
+    public static HttpResponse sendOrderRequest(UserSessionController us_contr, String proxy_addr, String area){
 
 
         Gson gson = new Gson();
@@ -566,7 +567,7 @@ public class ConnectivityController {   //Singleton
                 true,
                 area);
         String msg_body = gson.toJson(req_body);
-        ConnectivityController.sendPost(msg_body,proxy_addr);
+        return ConnectivityController.sendPost(msg_body,proxy_addr);
     }
 
     public static void sendAddOrderToTableRequest(UserSessionController us_contr,

@@ -1,4 +1,5 @@
 package com.lightingorder.Model.messages;
+
 public class baseMessage {
 	public String user;
 	public String proxySource;

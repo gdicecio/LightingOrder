@@ -15,11 +15,13 @@ public class ConnectionErrors {
         HttpResponseParse,
         ServerGetRequest,
         ServerAlreadyExecuted,
+        ClientTimeout,
         OtherException,
     };
 
     public static String currentError = "";
     public static ArrayList<String> hystory_errors = new ArrayList<String>();
+
 
 
 

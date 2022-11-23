@@ -8,6 +8,7 @@ import java.util.Map;
 
 public class StdTerms {
 
+    // ================================ COLOR ================================
     public static final int blue = Color.rgb(0, 102, 255);//YELLOW
     public static final int green = Color.rgb(0, 204, 0);//GREEN
     public static final int red = Color.rgb(255, 0, 0); //RED;
@@ -15,12 +16,20 @@ public class StdTerms {
     public static final int orange = Color.rgb(255, 102, 0);
     public static final int purple = Color.rgb(102, 0, 204);
 
+    // ================================ NETWORK ================================
     public static final boolean manual_ip_address = false;
     public static final String ipAddress = "192.168.43.1";
     public static final String proxyLoginAddress = "192.168.1.104:8085/loginSend";
    // public static final String proxyLoginAddress = "192.168.1.115:8085/loginSend";
     public static final int server_port = 5000;
 
+    // ================================ AUTHENTICATION ================================
+    public static String access_token = " ";
+    public static String refresh_token = " ";
+    public static String type_token = " ";
+
+
+    //================================ ROLES - FUNCTION ================================
     static final public Map<String, String> UC_Role;
     static {
         Map <String, String> aMap = new HashMap<>();
@@ -32,7 +41,7 @@ public class StdTerms {
         UC_Role = Collections.unmodifiableMap(aMap);
     }
 
-
+    //================================ ROLES ================================
     public enum roles{
         Cameriere,
         Accoglienza,

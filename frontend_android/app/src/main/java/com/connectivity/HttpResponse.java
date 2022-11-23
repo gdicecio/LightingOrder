@@ -7,8 +7,8 @@ import java.util.StringTokenizer;
 
 public class HttpResponse {
 
-    int code;
-    String result;
+    int code = 0;
+    String result = "";
     private HashMap<String, String> headers;
     String body;
     private final String version = "HTTP/1.1";

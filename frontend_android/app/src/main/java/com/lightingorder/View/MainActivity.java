@@ -14,13 +14,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.connectivity.ConnectionErrors;
+import com.connectivity.HttpResponse;
 import com.google.gson.Gson;
 import com.lightingorder.Controller.ConnectivityController;
 import com.lightingorder.Controller.AppStateController;
 import com.lightingorder.Controller.UserSessionController;
+import com.lightingorder.Model.messages.KeyCloakToken;
 import com.lightingorder.R;
 import com.lightingorder.StdTerms;
 import com.lightingorder.Model.messages.loginRequest;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,12 +61,47 @@ public class MainActivity extends AppCompatActivity {
         Log.d("myIP", ipAddress);
         Log.d("loginIP", StdTerms.proxyLoginAddress);
         user_contr.setUserIpAddress(ipAddress+":"+(StdTerms.server_port));
-        //user_contr.setUserIpAddress("192.168.42.129:5000");
-        //user_contr.setUserIpAddress("192.168.1.130:5000");
 
-        ConnectivityController.sendLoginRequest(user_contr, ed_user_password.getText().toString());
+        HttpResponse res = ConnectivityController.sendLoginRequest(user_contr, ed_user_password.getText().toString());
         Log.d("ACTIVITY","MAIN ACTIVITY: Login request sent");
+        Log.d("ACTIVITY:", "MAIN ACTIVITY: Login response: " + res.getCode() + res.getResult() );
+      //  ArrayList<String> k = ConnectionErrors.hystory_errors;
 
+        if(res.getCode() >= 200 && res.getCode() < 300) {
+            //Sono sicuro che ho ricevuto l'access token
+            Gson parser = new Gson();
+            KeyCloakToken t = parser.fromJson(res.getBody(), KeyCloakToken.class);
+            StdTerms.access_token = t.access_token;
+            StdTerms.refresh_token = t.refresh_token;
+            StdTerms.type_token = t.token_type;
+
+            while (user_contr.getHashRuoli_Proxy().size() == 0) ; //Aspetto infinitamente di ricevere i ruoli
+
+            if (AppStateController.getApplication().connectionStateIsOK()) {
+                if (user_contr.getHashRuoli_Proxy().size() > 0) {
+                    user_contr.setloginResult(true);
+                    Intent i = new Intent(getApplicationContext(), FunctionalityActivity.class);
+                    startActivity(i);
+                    Log.d("LOGIN", "LOGIN successful");
+                } else {
+                    user_contr.setloginResult(false);
+                    Log.d("LOGIN", "LOGIN failed");
+                }
+            } else {
+                Log.d("PROXY", "MAIN ACTIVITY: Proxy login not reachable, login failed");
+                user_contr.setloginResult(false);
+            }
+        } else{
+            AppStateController.getApplication().getCurrent_activity().runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast t = Toast.makeText(AppStateController.getApplication().getCurrent_activity(), "Codice: "+res.getCode(), Toast.LENGTH_LONG);
+                    t.show();
+                }
+            });
+        }
+    }
+
+        /*
         new CountDownTimer(3000, 1000) {
             public void onFinish() {
                 // When timer is finished // Execute your code here
@@ -86,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                 // millisUntilFinished    The amount of time until finished.
             }
         }.start();
-    }
+         */
 
     @Override
     protected void onStart() {

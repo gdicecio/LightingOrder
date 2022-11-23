@@ -5,9 +5,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.connectivity.HttpResponse;
 import com.lightingorder.Controller.AppStateController;
 import com.lightingorder.Controller.ConnectivityController;
 import com.lightingorder.View.Adapters.FunctionalityAdapter;
@@ -38,6 +40,7 @@ public class FunctionalityActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 Functionality f = funs.get(position);
+                HttpResponse res = new HttpResponse();
 
                 //Retrieve the ID of the Functionality ==> Use case name
                 String use_case =  f.getID();
@@ -52,16 +55,22 @@ public class FunctionalityActivity extends AppCompatActivity {
 
                 if(use_case.equals(StdTerms.useCases.CreaOrdinazione.name()) ||
                         use_case.equals(StdTerms.useCases.AggiornaStatoTavolo.name())) {
-                    ConnectivityController.sendTableRequest(user_contr,proxy_addr);
-                    Log.d("ACTIVITY","FUNCTIONALITY ACTIVITY: Table request sent");
-
+                    res = ConnectivityController.sendTableRequest(user_contr,proxy_addr);
+                    Log.d("ACTIVITY","FUNCTIONALITY ACTIVITY: Table request sent-" + "Code: "+res.getCode());
+                    HttpResponse finalRes = res;
+                    AppStateController.getApplication().getCurrent_activity().runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast t = Toast.makeText(AppStateController.getApplication().getCurrent_activity(), "Errore " + finalRes.getCode(), Toast.LENGTH_LONG);
+                            t.show();
+                        }
+                    });
                 }
                 else if(use_case.equals(StdTerms.useCases.VisualizzaOrdinazioniBar.name()) ||
                         use_case.equals(StdTerms.useCases.VisualizzaOrdinazioniCucina.name()) ||
                         use_case.equals(StdTerms.useCases.VisualizzaOrdinazioniForno.name()) ){
-                    ConnectivityController.sendOrderRequest(user_contr,user_contr.getCurrentProxy(),
+                    res = ConnectivityController.sendOrderRequest(user_contr,user_contr.getCurrentProxy(),
                             user_contr.getCurrentRole());
-                    Log.d("ACTIVITY","FUNCTIONALITY ACTIVITY: Order request sent");
+                    Log.d("ACTIVITY","FUNCTIONALITY ACTIVITY: Order request sent-" + "Code: "+res.getCode());
                 }
             }
         });
@@ -72,10 +81,10 @@ public class FunctionalityActivity extends AppCompatActivity {
         if(user_contr.checkRole(StdTerms.roles.Cameriere.name())){
             String proxy_cameriere = user_contr.getHashRuoli_Proxy().get(StdTerms.roles.Cameriere.name());
 
-            ConnectivityController.sendMenuRequest(
+            HttpResponse res = ConnectivityController.sendMenuRequest(
                     user_contr,
                     proxy_cameriere);
-            Log.d("ACTIVITY","FUNCTIONALITY ACTIVITY: Menu request sent");
+            Log.d("ACTIVITY","FUNCTIONALITY ACTIVITY: Menu request sent-" + "Code: "+res.getCode());
         }
     }
 

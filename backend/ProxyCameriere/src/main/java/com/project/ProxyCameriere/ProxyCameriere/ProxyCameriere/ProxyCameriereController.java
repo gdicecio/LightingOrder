@@ -3,6 +3,7 @@ package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere;
 
 import com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS.ReceiverJMS;
 import com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS.SenderJMS;
+import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+
+import javax.annotation.security.RolesAllowed;
 
 /*
  * 1) POST mapping /register -> Iscrizione dell'applicazione al webhook del proxy
@@ -49,8 +53,10 @@ public class ProxyCameriereController {
      *
      * Post request must contain a not null body.
      */
+
+
     @PostMapping (value = "/waitersSend")
-    public ResponseEntity<String> sendJMS (@RequestBody String event) {
+    public ResponseEntity<String> sendJMS (@RequestHeader String Authorization, @RequestBody String event) {
         sender.sendMessage(event);
         log.info(event);
         return new ResponseEntity<>("Event sent", HttpStatus.OK);
