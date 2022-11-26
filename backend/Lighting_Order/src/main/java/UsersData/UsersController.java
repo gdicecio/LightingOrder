@@ -39,7 +39,7 @@ public class UsersController {
 			UserDAOPSQL db = new UserDAOPSQL();
 			String user = db.findUserByIdJSON(id);
 
-			if(user == null) 
+			if(user == null)
 				this.ec = ErrorCode.UserNotFoundInDB;
 			else {
 				setUserByJSON(user);
@@ -60,24 +60,35 @@ public class UsersController {
 		//Accesso in keycloak
 		AuthzClient keycloak_client = AuthzClient.create();
 		AccessTokenResponse response = keycloak_client.obtainAccessToken(id,password);
-		String token = response.getToken();
 
-		Base64.Decoder decoder = Base64.getUrlDecoder();
-		String[] jwtToken = token.split("\\.");
-		String head = new String(decoder.decode(jwtToken[0]));
-		String body = new String(decoder.decode(jwtToken[1]));
+		if (response.getError().isEmpty()) {
+			String token = response.getToken();
 
-		Gson parser = new Gson();
-		KeycloakToken obj = parser.fromJson(body, KeycloakToken.class);
+			Base64.Decoder decoder = Base64.getUrlDecoder();
+			String[] jwtToken = token.split("\\.");
+			String head = new String(decoder.decode(jwtToken[0]));
+			String body = new String(decoder.decode(jwtToken[1]));
 
-		for(String role : obj.realm_access.roles) {
-			if (	!role.equals("offline_access") &&
-					!role.equals("default-roles-ssd-realm") &&
-					!role.equals("uma_authorization"))
-				roles.add(role);
+			Gson parser = new Gson();
+			KeycloakToken obj = parser.fromJson(body, KeycloakToken.class);
+
+			for (String role : obj.realm_access.roles) {
+				if (!role.equals("offline_access") &&
+						!role.equals("default-roles-ssd-realm") &&
+						!role.equals("uma_authorization"))
+					roles.add(role);
+			}
+
+			setUserByJSONToken(obj, token);
+
+			// Dovremmo tornare anche l'access token
+
+			return roles;
 		}
-
-		return roles;
+		else {
+			this.ec = ErrorCode.UserPasswordWrong;
+			return null;
+		}
 
 	}
 
@@ -114,13 +125,6 @@ public class UsersController {
 		return roles;
 	}
 	*/
-	public void loginAll() {
-		users = new ArrayList<User>();
-		UserDAOPSQL db = new UserDAOPSQL();
-		List<String> list = db.findAllUserJSON();
-		for(String single_user_json : list)
-			setUserByJSON(single_user_json);
-	}
 	
 	public boolean checkRole(String id, String role) {
 		Optional<User> u = getUserById(id);
@@ -135,15 +139,16 @@ public class UsersController {
 			return false;
 	}
 	
-	public boolean checkUser(String id) {
+	public boolean checkUser(String token) {
 		boolean found = false;
 		for(User u : users) {
-			if(u.isMe(id))
+			if(u.isMe_ByToken(token))
 				found = true;
 		}
 		return found;
 	}
-	
+
+	/*
 	public String getUserByIdJSON(String id) {
 		Optional<User> u = getUserById(id);
 		if(u.isPresent())
@@ -151,24 +156,24 @@ public class UsersController {
 		else 
 			return "";
 	}
-	
-	public boolean setUserByJSON(String UserJSON) {
+	 */
+
+	public boolean setUserByJSONToken(KeycloakToken tokenJSON, String token) {
 		User u = new User();
 		boolean created = false;
 		try {
-			JSONObject user = new JSONObject(UserJSON);
-			u.setName(user.getString("name"));
-			u.setSurname(user.getString("surname"));
-			u.setId(user.getString("id"));
-			
-			
-			JSONArray roles_list = user.getJSONArray("roles");
+			//JSONObject user = new JSONObject(UserJSON);
+			u.setName(tokenJSON.name);
+			u.setSurname(tokenJSON.family_name);
+			u.setId(tokenJSON.sid);
+			u.setToken(token);
+
 			List<String> temp = new ArrayList<String>();
-			for(int i=0; i<roles_list.length(); i++) 
-				temp.add(roles_list.get(i).toString());
+			for(int i=0; i<tokenJSON.realm_access.roles.size(); i++)
+				temp.add(tokenJSON.realm_access.roles.get(i));
 			
 			u.setRoles(temp);
-			if(checkUser(u.getId()))
+			if(checkUser(u.getToken()))
 				created = false;
 			else {
 				users.add(u);
@@ -186,13 +191,31 @@ public class UsersController {
 		return this.ec;
 	}
 	
-	public Optional<User> getUserById(String id){
+	public Optional<User> getUserBy_Token(String token){
 		boolean found = false;
 		this.ec = UsersController.ErrorCode.UserNotFound;
 		int index = 0;
 		
 		while(!found && index<users.size()) {
-			if(users.get(index).isMe(id))
+			if(users.get(index).isMe_ByToken(token))
+				found = true;
+			index++;
+		}
+		if(!found)
+			return Optional.empty();
+		else {
+			this.ec = UsersController.ErrorCode.UserFound;
+			return Optional.of(users.get(index-1));
+		}
+	}
+
+	public Optional<User> getUserById(String id){
+		boolean found = false;
+		this.ec = UsersController.ErrorCode.UserNotFound;
+		int index = 0;
+
+		while(!found && index<users.size()) {
+			if(users.get(index).isMe_ByID(id))
 				found = true;
 			index++;
 		}
@@ -209,7 +232,7 @@ public class UsersController {
 	 * @param o order to be inserted
 	 * @return empty if the user doesn't exists else optional.of operationn result
 	 */
-	public Optional<User> registerOrderToUser(String id,Order o) {
+	public Optional<User> registerOrderToUser(String id, Order o) {
 		login(id);
 		Optional<User> user=this.getUserById(id);
 		boolean result;

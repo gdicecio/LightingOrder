@@ -8,8 +8,8 @@
         <outputRelativeToContentRoot value="true" />
         <module name="lighting_order" />
         <module name="ProxyCameriere" />
-        <module name="ProxyLogin" />
         <module name="ProxyRealizzotore" />
+        <module name="ProxyLogin" />
         <module name="ProxyAccoglienza" />
       </profile>
     </annotationProcessing>

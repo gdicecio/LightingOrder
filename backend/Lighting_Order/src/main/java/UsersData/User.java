@@ -27,6 +27,8 @@ public class User {
 	private String surname;
 	private String id;
 	private List<String> roles = null;
+	private String token;
+
 	
 	public enum userRoles{
 		Accoglienza,
@@ -40,11 +42,12 @@ public class User {
 		this.roles = new ArrayList<String>();
 	}
 	
-	public User(String name, String surname, String id) {
+	public User(String name, String surname, String id, String token) {
 		this.name = name;
 		this.surname = surname;
 		this.id = id;
 		this.roles = new ArrayList<String>();
+		this.token = token;
 	}
 	
 	public String getJSONReppresentation() {
@@ -88,6 +91,10 @@ public class User {
 	public void setId(String id) {
 		this.id = id;
 	}
+
+	public String getToken() {return token;}
+
+	public void setToken(String t) {this.token = t;}
 	public List<String> getRoles() {
 		return roles;
 	}
@@ -96,8 +103,15 @@ public class User {
 		for(String role : roles) 
 			this.roles.add(role);
 	}
-	public boolean isMe(String id) {
+	public boolean isMe_ByID(String id) {
 		if(id.equals(this.id))
+			return true;
+		else
+			return false;
+	}
+
+	public boolean isMe_ByToken(String token) {
+		if(token.equals(this.token))
 			return true;
 		else
 			return false;

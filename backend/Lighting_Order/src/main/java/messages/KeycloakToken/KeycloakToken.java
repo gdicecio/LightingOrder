@@ -29,5 +29,4 @@ class ResourceAccess {
 }
 class Account {
     public ArrayList<String> roles = new ArrayList <> ();
-
 }

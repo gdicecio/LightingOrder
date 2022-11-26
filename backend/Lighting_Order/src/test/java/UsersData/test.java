@@ -36,7 +36,8 @@ class test {
 		assertEquals(c.users.size(), 1);
 		assertEquals(roles.get(0), "Cucina");
 	}
-	
+
+	/*
 	@Test
 	void testGetUserById() {
 		c.login("3");
@@ -46,6 +47,7 @@ class test {
 		assertEquals(u.get().getName(), "Nicola");
 		assertEquals(u.get().getRoles().get(0), "Forno");
 	}
+	 */
 	
 	@Test
 	void testCheckRole() {
@@ -56,17 +58,20 @@ class test {
 	@Test
 	void testUser() {
 		c.login("1");
-		assertTrue(c.checkUser("1"));
-		assertFalse(c.checkUser("2"));
+		// assertTrue(c.checkUser("1"));
+		// assertFalse(c.checkUser("2"));
 	}
-	
+
+	/*
 	@Test
 	void testGetUserByIdJSON() {
 		c.login("1");
 		Optional<User> u = c.getUserById("1");
 		assertEquals(u.get().getJSONReppresentation(), c.getUserByIdJSON("1"));
 	}
-	
+	 */
+
+	/*
 	@Test
 	void testSetUserByIdJSON() {
 		c.login("1");
@@ -78,15 +83,7 @@ class test {
 		assertTrue(user5.isPresent());
 		assertTrue(user5.get().getId().equals("5"));
 	}
-	
-	@Test
-	void testLoginAll() {
-		c.loginAll();
-		assertTrue(c.users.size()==4);
-		Optional<User> u = c.getUserById("4");
-		assertEquals(u.get().getName(), "Antonio");
-		assertEquals(u.get().getSurname(), "Emmanuele");
-	}
+	*/
 	
 	
 
