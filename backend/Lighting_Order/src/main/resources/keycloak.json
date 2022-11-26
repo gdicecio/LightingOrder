@@ -1,0 +1,8 @@
+{
+  "realm": "SSD-Realm",
+  "auth-server-url" : "http://localhost:9000",
+  "resource" : "lighting_order",
+  "credentials": {
+    "secret": "zkDcjndhfTahODX6Ix86Es0MYtD3XetK"
+  }
+}

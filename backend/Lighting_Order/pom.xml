@@ -74,6 +74,19 @@
 		  	<artifactId>json</artifactId>
 		  	<version>20131018</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-core</artifactId>
+			<version>20.0.1</version>
+		</dependency>
+
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-authz-client</artifactId>
+            <version>20.0.1</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 <!--
 	<dependencyManagement>

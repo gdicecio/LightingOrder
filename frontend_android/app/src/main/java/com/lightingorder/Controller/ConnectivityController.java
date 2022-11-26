@@ -420,8 +420,8 @@ public class ConnectivityController {   //Singleton
         req.setHeader("Accept", "*/*");
         req.setHeader("Connection", "keep-alive");
         req.setHeader("Host", address_and_port);
-        if(StdTerms.access_token != " ")
-            req.setHeader("Authorization", StdTerms.type_token.toLowerCase() + " " + StdTerms.access_token);
+     //   if(StdTerms.access_token != " ")
+     //       req.setHeader("Authorization", StdTerms.type_token.toLowerCase() + " " + StdTerms.access_token);
         req.setBody(body);
 
         HttpResponse res = client.send(req);

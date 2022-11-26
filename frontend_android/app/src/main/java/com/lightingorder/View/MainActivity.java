@@ -69,12 +69,12 @@ public class MainActivity extends AppCompatActivity {
 
         if(res.getCode() >= 200 && res.getCode() < 300) {
             //Sono sicuro che ho ricevuto l'access token
-            Gson parser = new Gson();
+          /*  Gson parser = new Gson();
             KeyCloakToken t = parser.fromJson(res.getBody(), KeyCloakToken.class);
             StdTerms.access_token = t.access_token;
             StdTerms.refresh_token = t.refresh_token;
             StdTerms.type_token = t.token_type;
-
+        */
             while (user_contr.getHashRuoli_Proxy().size() == 0) ; //Aspetto infinitamente di ricevere i ruoli
 
             if (AppStateController.getApplication().connectionStateIsOK()) {

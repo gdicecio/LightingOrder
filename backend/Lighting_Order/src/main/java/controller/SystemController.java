@@ -15,6 +15,7 @@ import messages.orderNotification;
 import messages.orderRequest;
 import messages.tableOperation;
 import messages.tableRequest;
+import org.keycloak.KeycloakSecurityContext;
 import request_generator.controllerIface;
 
 import java.util.ArrayList;
@@ -569,7 +570,7 @@ public class SystemController  extends GeneralController implements controllerIf
 		Gson gson=new Gson();
 		loginRequest obj = gson.fromJson(request, loginRequest.class);
 		List<loginRequest> notifications=new ArrayList<>();
-		List<String>roles=this.usersController.loginFirstTime(obj.user, obj.password);
+		List<String>roles = this.usersController.loginFirstTime(obj.user, obj.password);
 		JsonArray array=new JsonArray();
 		for(String role : roles) {
 			notifications.add(generateRegisterNotification(obj.user,obj.url,role));
@@ -579,6 +580,7 @@ public class SystemController  extends GeneralController implements controllerIf
 		
 		//publish the login Request
 		this.brokerIface.publishResponse(gson.toJson(obj,loginRequest.class));
+
 		//Publish the Register Notifications
 		for(loginRequest notification:notifications) 
 			this.brokerIface.publishResponse(gson.toJson(notification,loginRequest.class));

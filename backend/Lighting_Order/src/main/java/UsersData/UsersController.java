@@ -1,12 +1,14 @@
 package UsersData;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import com.google.gson.Gson;
+import messages.KeycloakToken.KeycloakToken;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.stereotype.Service;
 
 import DataAccess.UserDAOPSQL;
@@ -52,6 +54,34 @@ public class UsersController {
 		
 		return roles;
 	}
+
+	public List<String> loginFirstTime(String id, String password){
+		List<String> roles = new ArrayList<>();
+		//Accesso in keycloak
+		AuthzClient keycloak_client = AuthzClient.create();
+		AccessTokenResponse response = keycloak_client.obtainAccessToken(id,password);
+		String token = response.getToken();
+
+		Base64.Decoder decoder = Base64.getUrlDecoder();
+		String[] jwtToken = token.split("\\.");
+		String head = new String(decoder.decode(jwtToken[0]));
+		String body = new String(decoder.decode(jwtToken[1]));
+
+		Gson parser = new Gson();
+		KeycloakToken obj = parser.fromJson(body, KeycloakToken.class);
+
+		for(String role : obj.realm_access.roles) {
+			if (	!role.equals("offline_access") &&
+					!role.equals("default-roles-ssd-realm") &&
+					!role.equals("uma_authorization"))
+				roles.add(role);
+		}
+
+		return roles;
+
+	}
+
+	/*
 	public List<String> loginFirstTime(String id, String password) {
 		/** Funzione per caricare la prima volta un utente nel sistema
 		 * La password è necessaria solo in questo step.
@@ -59,7 +89,8 @@ public class UsersController {
 		 * non devono controllare ogni volta anche la password */
 
 		//Caricamento preliminare se necessario
-		if(!checkUser(id)) {
+	/*
+	if(!checkUser(id)) {
 			UserDAOPSQL db = new UserDAOPSQL();
 			String user = db.findUserByIdJSON(id);
 
@@ -82,6 +113,7 @@ public class UsersController {
 
 		return roles;
 	}
+	*/
 	public void loginAll() {
 		users = new ArrayList<User>();
 		UserDAOPSQL db = new UserDAOPSQL();
