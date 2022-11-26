@@ -74,7 +74,7 @@ public class Order {
 	 * @param priority of the items
 	 */
 	public Order(int id,Optional<Table>t,List<String>itemsNames,List<List<String>>additiveGoods,
-			List<List<String>>subGoods,List<Integer>priority,Integer userID,
+			List<List<String>>subGoods,List<Integer>priority, Integer userID, String userToken,
 			RestaurantController  controller) {
 		this.orderID=id;
 		this.associatedTable=t;
@@ -94,7 +94,7 @@ public class Order {
 		this.controller.registerOrder(this);
 		
 		//register the order
-		this.generator=this.controller.askForOrderRegistration(userID.toString(), this);
+		this.generator=this.controller.askForOrderRegistration(userToken.toString(), this);
 	}
 	
 	public Order(String jsonRepresentation,Optional<Table> t,RestaurantController controller) {
@@ -139,7 +139,9 @@ public class Order {
 		
 		//Register the order to the user.
 		obj.get("userID").getAsString();
-		this.generator=this.controller.askForOrderRegistration(obj.get("userID").getAsString(), this);
+
+		//TODO nel messaggio degli ordini da mettere il token
+		this.generator=this.controller.askForOrderRegistration(obj.get("userToken").getAsString(), this);
 	}
 	
 	public void setUser(User u) {this.generator=Optional.of(u);}

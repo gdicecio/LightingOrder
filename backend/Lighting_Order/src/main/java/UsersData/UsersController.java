@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.google.gson.Gson;
 import messages.KeycloakToken.KeycloakToken;
+import org.apache.activemq.artemis.api.core.Pair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +33,7 @@ public class UsersController {
 		users = new ArrayList<User>();
 	}
 	
-	public List<String> login(String id) {
+	public List<String> login(String token) {
 
 		//Caricamento preliminare se necessario
 	/*	if(!checkUser(id)) {
@@ -47,7 +48,7 @@ public class UsersController {
 			}
 		}
 		*/
-		Optional<User> u = getUserById(id);
+		Optional<User> u = getUserBy_Token(token);
 		List<String> roles = null;
 		if(u.isPresent())
 			roles = u.get().getRoles();
@@ -55,7 +56,7 @@ public class UsersController {
 		return roles;
 	}
 
-	public List<String> loginFirstTime(String id, String password){
+	public Pair<List<String>, String> loginFirstTime(String id, String password){
 		List<String> roles = new ArrayList<>();
 		//Accesso in keycloak
 		AuthzClient keycloak_client = AuthzClient.create();
@@ -81,9 +82,7 @@ public class UsersController {
 
 			setUserByJSONToken(obj, token);
 
-			// Dovremmo tornare anche l'access token
-
-			return roles;
+			return new Pair<List<String>, String>(roles,token);
 		}
 		else {
 			this.ec = ErrorCode.UserPasswordWrong;
@@ -232,9 +231,9 @@ public class UsersController {
 	 * @param o order to be inserted
 	 * @return empty if the user doesn't exists else optional.of operationn result
 	 */
-	public Optional<User> registerOrderToUser(String id, Order o) {
-		login(id);
-		Optional<User> user=this.getUserById(id);
+	public Optional<User> registerOrderToUser(String token, Order o) {
+		login(token);
+		Optional<User> user=this.getUserById(token);
 		boolean result;
 		if(user.isPresent()) {
 			result=user.get().registerOrder(o);

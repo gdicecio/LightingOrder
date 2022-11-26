@@ -4,31 +4,23 @@ import MenuAndWareHouseArea.MenuAndGoodsController;
 import MenuAndWareHouseArea.OrderedItemState;
 import TableAndOrdersArea.Order;
 import TableAndOrdersArea.RestaurantController;
-import TableAndOrdersArea.TableState;
 import TableAndOrdersArea.RestaurantController.returnCodes;
+import TableAndOrdersArea.TableState;
 import UsersData.UsersController;
-import messages.cancelOrderRequest;
-import messages.itemOpRequest;
-import messages.loginRequest;
-import messages.menuRequest;
-import messages.orderNotification;
-import messages.orderRequest;
-import messages.tableOperation;
-import messages.tableRequest;
-import org.keycloak.KeycloakSecurityContext;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import messages.*;
+import org.apache.activemq.artemis.api.core.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Service;
 import request_generator.controllerIface;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Service;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 
 
 /**
@@ -58,12 +50,12 @@ public class SystemController  extends GeneralController implements controllerIf
 		roleFailed,
 		roleOk,
 		operationCompleted,
-		operationAborted;
+		operationAborted
 	}
 	public enum responses{
 		orderCanceled,
 		orderNotCanceled,
-		orderNotFound;
+		orderNotFound
 	}
 	
 	/**
@@ -85,7 +77,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	public void menuRequest( String request) {
 			Gson gson=new Gson();
 			menuRequest obj=gson.fromJson(request, menuRequest.class);
-			usersController.login(obj.user);
+			usersController.login(obj.access_token);
 			//checking the role of the request
 			if(this.usersController.checkRole(
 					obj.user
@@ -125,7 +117,7 @@ public class SystemController  extends GeneralController implements controllerIf
 		Gson gson=new Gson();
 		tableRequest obj=gson.fromJson(request,tableRequest.class);
 		//checking the role of the request
-		usersController.login(obj.user);
+		usersController.login(obj.access_token);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Accoglienza.name() )||
@@ -177,7 +169,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	public void userWaitingForOrderRequest(String request) {
 		Gson gson=new Gson();
 		tableOperation obj=gson.fromJson(request, tableOperation.class);
-		usersController.login(obj.user);
+		usersController.login(obj.access_token);
 		tableOperation notification=null;
 		if(this.usersController.checkRole(
 				obj.user
@@ -209,7 +201,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 					messageName:"freeTableRequest"
 	 * 					tableID:"tableIDValue"
 	 * 					tableRoomNumber:"tableRoomNumber"
-	 * 					
+	 *
 	 * 				}
 	 * 	response:	{
 	 * 					request
@@ -221,7 +213,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	public void freeTableRequest(String request) {
 		Gson gson=new Gson();
 		tableOperation obj=gson.fromJson(request, tableOperation.class);
-		usersController.login(obj.user);
+		usersController.login(obj.access_token);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Accoglienza.name()))
@@ -275,7 +267,7 @@ public class SystemController  extends GeneralController implements controllerIf
 		Gson gson=new Gson();
 		messages.orderToTableGenerationRequest obj=gson.fromJson(request,
 				messages.orderToTableGenerationRequest.class);
-		usersController.login(obj.user);
+		usersController.login(obj.access_token);
 		List<orderNotification> makerNotifications=new ArrayList<>();
 		if(this.usersController.checkRole(
 				obj.user
@@ -325,7 +317,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	public void cancelOrderRequest(String request) {
 		Gson gson=new Gson();
 		cancelOrderRequest obj=gson.fromJson(request, cancelOrderRequest.class);
-		usersController.login(obj.user);
+		usersController.login(obj.access_token);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Cameriere.name() ))
@@ -361,7 +353,7 @@ public class SystemController  extends GeneralController implements controllerIf
 	public void cancelOrderedItemRequest(String request) {
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
-		usersController.login(obj.user);
+		usersController.login(obj.access_token);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Cameriere.name() ))
@@ -399,7 +391,7 @@ public class SystemController  extends GeneralController implements controllerIf
 		
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
-		usersController.login(obj.user);
+		usersController.login(obj.access_token);
 		if(	this.usersController.checkRole(
 						obj.user
 						,UsersData.User.userRoles.Bar.name() )
@@ -454,7 +446,7 @@ public class SystemController  extends GeneralController implements controllerIf
 		
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
-		usersController.login(obj.user);
+		usersController.login(obj.access_token);
 		List<orderNotification>makerNotifications=new ArrayList<>();
 		if(		this.usersController.checkRole(
 				obj.user
@@ -514,7 +506,7 @@ public class SystemController  extends GeneralController implements controllerIf
 		Gson gson=new Gson();
 		orderRequest obj=gson.fromJson(request, orderRequest.class);
 		
-		usersController.login(obj.user);
+		usersController.login(obj.access_token);
 		if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Bar.name() )
@@ -570,10 +562,13 @@ public class SystemController  extends GeneralController implements controllerIf
 		Gson gson=new Gson();
 		loginRequest obj = gson.fromJson(request, loginRequest.class);
 		List<loginRequest> notifications=new ArrayList<>();
-		List<String>roles = this.usersController.loginFirstTime(obj.user, obj.password);
+
+		Pair<List<String>, String> pair = this.usersController.loginFirstTime(obj.user, obj.password);
+		List<String> roles = pair.getA();
+		String token = pair.getB();
 		JsonArray array=new JsonArray();
 		for(String role : roles) {
-			notifications.add(generateRegisterNotification(obj.user,obj.url,role));
+			notifications.add(generateRegisterNotification(obj.user,token,obj.url,role));
 			array.add(role);
 		}
 		obj.response=array.toString();
@@ -643,10 +638,11 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * @param role of the user
 	 * @return the RegisterNotification message
 	 */
-	private loginRequest generateRegisterNotification(String user,
+	private loginRequest generateRegisterNotification(String user, String token,
 			String url,String role) {
 		loginRequest toRet =new loginRequest();
 		toRet.user=user;
+		toRet.access_token=token;
 		toRet.url=url;
 		toRet.result=role;
 		toRet.messageName="registerNotification";

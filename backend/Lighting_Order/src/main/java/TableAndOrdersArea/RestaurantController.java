@@ -526,8 +526,8 @@ public class RestaurantController {
 	 * @param o
 	 * @return optional of the user if the order was registered
 	 */
-	public Optional<User> askForOrderRegistration( String userID,Order o){ 
-		return this.userController.registerOrderToUser(userID, o);
+	public Optional<User> askForOrderRegistration( String token,Order o){
+		return this.userController.registerOrderToUser(token, o);
 		
 	}
 	/**
