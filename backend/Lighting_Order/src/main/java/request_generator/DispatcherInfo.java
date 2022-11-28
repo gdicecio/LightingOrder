@@ -1,5 +1,9 @@
 
 package request_generator;
+import org.keycloak.authorization.client.AuthorizationDeniedException;
+import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.representations.idm.authorization.AuthorizationRequest;
+import org.keycloak.representations.idm.authorization.AuthorizationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,10 +17,12 @@ import messages.baseMessage;
 @ComponentScan(basePackages= {"controller"})
 public class DispatcherInfo {
 	private controllerIface controllerFunctions;
-	
+	private AuthzClient c;
+
 	@Autowired
 	public DispatcherInfo(@Qualifier("SystemController") controllerIface input) {
 		this.controllerFunctions=input;
+		this.c = AuthzClient.create();
 	}
     public void callerFactory(String mex) {
     	
@@ -24,8 +30,17 @@ public class DispatcherInfo {
     	
     	baseMessage rec=gson.fromJson(mex, baseMessage.class);	
     	if(rec.messageName!=null) {
-	    	if(rec.messageName.equals(controllerIface.requests.tableRequest.name()))
-	    		controllerFunctions.tableRequest(mex);
+	    	if(rec.messageName.equals(controllerIface.requests.tableRequest.name())) {
+				AuthorizationRequest req = new AuthorizationRequest();
+				req.addPermission("api/tablerequest");
+				try {
+					// ACCESS TOKEN O REFRESH TOKEN?
+					AuthorizationResponse resp = c.authorization(rec.access_token).authorize();
+					controllerFunctions.tableRequest(mex);
+				} catch (AuthorizationDeniedException e) {
+					e.printStackTrace();
+				}
+			}
 	    	
 	    	else if(rec.messageName.equals(controllerIface.requests.userWaitingForOrderRequest.name()))
 	    		controllerFunctions.userWaitingForOrderRequest(mex);
