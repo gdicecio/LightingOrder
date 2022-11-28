@@ -56,7 +56,7 @@ public class ProxyCameriereController {
 
 
     @PostMapping (value = "/waitersSend")
-    public ResponseEntity<String> sendJMS (@RequestHeader String Authorization, @RequestBody String event) {
+    public ResponseEntity<String> sendJMS (@RequestBody String event) {
         sender.sendMessage(event);
         log.info(event);
         return new ResponseEntity<>("Event sent", HttpStatus.OK);

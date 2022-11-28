@@ -75,13 +75,29 @@ public class ConnectivityController {   //Singleton
             public HttpResponse onRequest(HttpRequest request) {
                 String req = request.getBody();
                 loginRequest msg_rcvd = gsonReq.fromJson(req, loginRequest.class);
-                user_contr.addRoleAndProxy(msg_rcvd.result,msg_rcvd.proxySource);
-                AppStateController.getApplication().getCurrent_activity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast t = Toast.makeText(AppStateController.getApplication().getCurrent_activity(), "Ruolo " + msg_rcvd.result + " riconosciuto!", Toast.LENGTH_LONG);
-                        t.show();
-                    }
-                });
+                switch(msg_rcvd.response){
+                    default:
+                        user_contr.setloginResult(true);
+                        StdTerms.access_token = msg_rcvd.access_token;
+                        user_contr.addRoleAndProxy(msg_rcvd.result,msg_rcvd.proxySource);
+                        AppStateController.getApplication().getCurrent_activity().runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast t = Toast.makeText(AppStateController.getApplication().getCurrent_activity(), "Ruolo " + msg_rcvd.result + " riconosciuto!", Toast.LENGTH_LONG);
+                                t.show();
+                            }
+                        });
+                        break;
+                    case "401":
+                        user_contr.setloginResult(false);
+                        AppStateController.getApplication().getCurrent_activity().runOnUiThread(new Runnable() {
+                            public void run() {
+                                Toast t = Toast.makeText(AppStateController.getApplication().getCurrent_activity(), "Credenziali errate", Toast.LENGTH_LONG);
+                                t.show();
+                            }
+                        });
+                        break;
+                }
+
                 HttpResponse response = new HttpResponse();
                 response.setCode(200);
                 response.setBody("Message Received");
@@ -420,8 +436,6 @@ public class ConnectivityController {   //Singleton
         req.setHeader("Accept", "*/*");
         req.setHeader("Connection", "keep-alive");
         req.setHeader("Host", address_and_port);
-     //   if(StdTerms.access_token != " ")
-     //       req.setHeader("Authorization", StdTerms.type_token.toLowerCase() + " " + StdTerms.access_token);
         req.setBody(body);
 
         HttpResponse res = client.send(req);
@@ -499,6 +513,7 @@ public class ConnectivityController {   //Singleton
                 "",
                 false,
                 "" );
+        req_body.access_token = StdTerms.access_token;
         Gson gson = new Gson();
         String msg_body = gson.toJson(req_body);
         return ConnectivityController.sendPost(msg_body, proxy_addr);
@@ -523,7 +538,7 @@ public class ConnectivityController {   //Singleton
                 1,
                 false,
                 "");
-
+        req_body.access_token = StdTerms.access_token;
         //Convert into string and send Post request
         Gson gson = new Gson();
         String msg_body = gson.toJson(req_body);
@@ -550,6 +565,7 @@ public class ConnectivityController {   //Singleton
                 "",
                 tableID,
                 tableRoom);
+        req_body.access_token = StdTerms.access_token;
         String msg_body = gson.toJson(req_body);
         ConnectivityController.sendPost(msg_body,proxy_addr);
     }
@@ -566,6 +582,7 @@ public class ConnectivityController {   //Singleton
                 "",
                 true,
                 area);
+        req_body.access_token = StdTerms.access_token;
         String msg_body = gson.toJson(req_body);
         return ConnectivityController.sendPost(msg_body,proxy_addr);
     }
@@ -591,6 +608,7 @@ public class ConnectivityController {   //Singleton
                 tableID,
                 roomNumber,
                 param);
+        req_body.access_token = StdTerms.access_token;
         String msg_body = gson.toJson(req_body);
         ConnectivityController.sendPost(msg_body,proxy_addr);
 
@@ -606,6 +624,7 @@ public class ConnectivityController {   //Singleton
                 "",
                 "",
                 orderID);
+        req_body.access_token = StdTerms.access_token;
         String msg_body = gson.toJson(req_body);
         ConnectivityController.sendPost(msg_body,proxy_addr);
     }
@@ -622,6 +641,7 @@ public class ConnectivityController {   //Singleton
                 "",
                 orderID,
                 lineNumber);
+        req_body.access_token = StdTerms.access_token;
         String msg_body = gson.toJson(req_body);
         ConnectivityController.sendPost(msg_body,proxy_addr);
 
@@ -639,6 +659,7 @@ public class ConnectivityController {   //Singleton
                 null,
                 orderID,
                 lineNumber);
+        req_body.access_token = StdTerms.access_token;
         String msg_body = gson.toJson(req_body);
         ConnectivityController.sendPost(msg_body,proxy_addr);
 
@@ -657,6 +678,7 @@ public class ConnectivityController {   //Singleton
                 orderID,
                 lineNumber);
         String msg_body = gson.toJson(req_body);
+        req_body.access_token = StdTerms.access_token;
         ConnectivityController.sendPost(msg_body,proxy_addr);
     }
 

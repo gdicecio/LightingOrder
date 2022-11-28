@@ -55,13 +55,8 @@ public class UsersController {
 		return roles;
 	}
 
-	public List<String> loginFirstTime(String id, String password){
+	public List<String> getRolesByAccessToken(String token){
 		List<String> roles = new ArrayList<>();
-		//Accesso in keycloak
-		AuthzClient keycloak_client = AuthzClient.create();
-		AccessTokenResponse response = keycloak_client.obtainAccessToken(id,password);
-		String token = response.getToken();
-
 		Base64.Decoder decoder = Base64.getUrlDecoder();
 		String[] jwtToken = token.split("\\.");
 		String head = new String(decoder.decode(jwtToken[0]));
@@ -78,7 +73,14 @@ public class UsersController {
 		}
 
 		return roles;
+	}
 
+	public String loginFirstTime(String id, String password){
+		List<String> roles = new ArrayList<>();
+		//Accesso in keycloak
+		AuthzClient keycloak_client = AuthzClient.create();
+		AccessTokenResponse response = keycloak_client.obtainAccessToken(id,password);
+		return response.getToken();
 	}
 
 	/*

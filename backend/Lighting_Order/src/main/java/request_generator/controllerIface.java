@@ -16,16 +16,17 @@ public interface controllerIface {
 		loginRequest
 		;
 	}
-	
-	public void tableRequest(String request);
-	public void userWaitingForOrderRequest(String request);
-	public void freeTableRequest(String request);
-	public void orderRequest(String request);
-	public void itemCompleteRequest(String request);
-	public void itemWorkingRequest(String request);
-	public void menuRequest(String request);
-	public void orderToTableGenerationRequest(String request);
-	public void cancelOrderRequest(String request);
-	public void cancelOrderedItemRequest(String request);
+
+
+	public void tableRequest(String request, boolean deny);
+	public void userWaitingForOrderRequest(String request, boolean deny);
+	public void freeTableRequest(String request, boolean deny);
+	public void orderRequest(String request, boolean deny);
+	public void itemCompleteRequest(String request, boolean deny);
+	public void itemWorkingRequest(String request, boolean deny);
+	public void menuRequest(String request, boolean deny);
+	public void orderToTableGenerationRequest(String request, boolean deny);
+	public void cancelOrderRequest(String request, boolean deny);
+	public void cancelOrderedItemRequest(String request, boolean deny);
 	public void loginRequest(String request);
 }

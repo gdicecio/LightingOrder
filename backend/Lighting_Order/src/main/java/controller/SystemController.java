@@ -7,15 +7,9 @@ import TableAndOrdersArea.RestaurantController;
 import TableAndOrdersArea.TableState;
 import TableAndOrdersArea.RestaurantController.returnCodes;
 import UsersData.UsersController;
-import messages.cancelOrderRequest;
-import messages.itemOpRequest;
-import messages.loginRequest;
-import messages.menuRequest;
-import messages.orderNotification;
-import messages.orderRequest;
-import messages.tableOperation;
-import messages.tableRequest;
+import messages.*;
 import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.authorization.client.util.HttpResponseException;
 import request_generator.controllerIface;
 
 import java.util.ArrayList;
@@ -29,6 +23,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+
+import javax.annotation.Resource;
 
 
 /**
@@ -82,15 +78,16 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 				}
 	 */
 	@Override
-	public void menuRequest( String request) {
+	public void menuRequest( String request, boolean deny) {
 			Gson gson=new Gson();
 			menuRequest obj=gson.fromJson(request, menuRequest.class);
-			usersController.login(obj.user);
+		//	usersController.login(obj.user);
 			//checking the role of the request
-			if(this.usersController.checkRole(
-					obj.user
-					,UsersData.User.userRoles.Cameriere.name() ))
-			{
+		//	if(this.usersController.checkRole(
+		//			obj.user
+		//			,UsersData.User.userRoles.Cameriere.name() ))
+		//	{
+			if(!deny){
 				obj.response=this.controllerMenu.getMenuJSON(obj.areaVisualization,
 						obj.areaMenu);
 				obj.result= results.roleOk.name();
@@ -119,20 +116,22 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 					result: "roleFailed/roleOk"
 	 * 					response: requestedTables
 	 * 					}
+
 	 */
 	@Override
-	public void tableRequest(String request) {
+	public void tableRequest(String request, boolean deny) {
 		Gson gson=new Gson();
 		tableRequest obj=gson.fromJson(request,tableRequest.class);
 		//checking the role of the request
-		usersController.login(obj.user);
-		if(this.usersController.checkRole(
-				obj.user
-				,UsersData.User.userRoles.Accoglienza.name() )||
-				this.usersController.checkRole(
-						obj.user
-						,UsersData.User.userRoles.Cameriere.name() ))
-		{
+	//	usersController.login(obj.user);
+	//	if(this.usersController.checkRole(
+	//			obj.user
+	//			,UsersData.User.userRoles.Accoglienza.name() )||
+	//			this.usersController.checkRole(
+	//					obj.user
+	//					,UsersData.User.userRoles.Cameriere.name() ))
+	//	{
+		if(!deny){
 			Optional<String> area=Optional.empty();
 			Optional<Integer> room=Optional.empty();
 			
@@ -149,7 +148,7 @@ public class SystemController  extends GeneralController implements controllerIf
 		}
 		this.brokerIface.publishResponse(gson.toJson(obj,tableRequest.class));
 	}
-	
+
 	
 	/**
 	 * @info a user sits in a table waiting to order
@@ -174,15 +173,16 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 				}
 	 */
 	@Override
-	public void userWaitingForOrderRequest(String request) {
+	public void userWaitingForOrderRequest(String request, boolean deny) {
 		Gson gson=new Gson();
 		tableOperation obj=gson.fromJson(request, tableOperation.class);
 		usersController.login(obj.user);
 		tableOperation notification=null;
-		if(this.usersController.checkRole(
+	/*	if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Accoglienza.name()))
-		{
+		{ */
+		if(!deny){
 			obj.response=this.controllerRestaurant.setTableWaiting(
 							obj.tableID,
 							obj.tableRoomNumber);
@@ -218,14 +218,15 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * 				}
 	 */
 	@Override
-	public void freeTableRequest(String request) {
+	public void freeTableRequest(String request, boolean deny) {
 		Gson gson=new Gson();
 		tableOperation obj=gson.fromJson(request, tableOperation.class);
 		usersController.login(obj.user);
-		if(this.usersController.checkRole(
+		/*if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Accoglienza.name()))
-		{
+		{*/
+		if(!deny){
 			obj.response=this.controllerRestaurant.setTableFree(
 							obj.tableID,
 							obj.tableRoomNumber);
@@ -271,16 +272,17 @@ public class SystemController  extends GeneralController implements controllerIf
 	 *				}
 	 */
 	@Override
-	public void orderToTableGenerationRequest(String request) {
+	public void orderToTableGenerationRequest(String request, boolean deny) {
 		Gson gson=new Gson();
 		messages.orderToTableGenerationRequest obj=gson.fromJson(request,
 				messages.orderToTableGenerationRequest.class);
 		usersController.login(obj.user);
 		List<orderNotification> makerNotifications=new ArrayList<>();
-		if(this.usersController.checkRole(
+		/*if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Cameriere.name() ))
-		{
+		{*/
+		if(!deny){
 			obj.result=results.roleOk.name();
 			obj.response=	this.controllerRestaurant.generateOrderForTableId
 					(		obj.orderParams.itemNames, 
@@ -322,14 +324,15 @@ public class SystemController  extends GeneralController implements controllerIf
 	 *				}
 	 */
 	@Override
-	public void cancelOrderRequest(String request) {
+	public void cancelOrderRequest(String request, boolean deny) {
 		Gson gson=new Gson();
 		cancelOrderRequest obj=gson.fromJson(request, cancelOrderRequest.class);
 		usersController.login(obj.user);
-		if(this.usersController.checkRole(
+		/*if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Cameriere.name() ))
-		{
+		{*/
+		if(!deny){
 			obj.result=this.controllerRestaurant.harOrder(obj.orderID);
 			if(obj.result.equals(returnCodes.orderFound.name()))
 					obj.response=controllerRestaurant.cancelOrder(obj.orderID)
@@ -358,14 +361,15 @@ public class SystemController  extends GeneralController implements controllerIf
 	 *				}
 	 */
 	@Override
-	public void cancelOrderedItemRequest(String request) {
+	public void cancelOrderedItemRequest(String request, boolean deny) {
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
 		usersController.login(obj.user);
-		if(this.usersController.checkRole(
+		/*if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Cameriere.name() ))
-		{
+		{*/
+		if(!deny){
 			obj.result=this.controllerRestaurant.hasItem(obj.orderID,obj.itemLineNumber);
 			if(obj.result.equals(returnCodes.itemFound.name()))
 					obj.response=controllerRestaurant.deleteItemFromOrder(obj.orderID,
@@ -395,12 +399,12 @@ public class SystemController  extends GeneralController implements controllerIf
 	 *				}
 	 */
 	@Override
-	public void itemWorkingRequest(String request) {
+	public void itemWorkingRequest(String request, boolean deny) {
 		
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
 		usersController.login(obj.user);
-		if(	this.usersController.checkRole(
+		/*if(	this.usersController.checkRole(
 						obj.user
 						,UsersData.User.userRoles.Bar.name() )
 				||this.usersController.checkRole(
@@ -411,7 +415,8 @@ public class SystemController  extends GeneralController implements controllerIf
 								obj.user
 								,UsersData.User.userRoles.Forno.name())
 			)
-		{
+		{*/
+		if(!deny){
 			obj.result=this.controllerRestaurant.hasItem(obj.orderID,obj.itemLineNumber);
 			if(obj.result.equals(returnCodes.itemFound.name()))
 					obj.response=controllerRestaurant.itemInWorking(obj.orderID,
@@ -450,13 +455,13 @@ public class SystemController  extends GeneralController implements controllerIf
 	 */
 	 
 	@Override
-	public void itemCompleteRequest(String request) {
+	public void itemCompleteRequest(String request, boolean deny) {
 		
 		Gson gson=new Gson();
 		itemOpRequest obj=gson.fromJson(request, itemOpRequest.class);
 		usersController.login(obj.user);
 		List<orderNotification>makerNotifications=new ArrayList<>();
-		if(		this.usersController.checkRole(
+	/*	if(		this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Bar.name() )
 		||this.usersController.checkRole(
@@ -468,6 +473,9 @@ public class SystemController  extends GeneralController implements controllerIf
 						,UsersData.User.userRoles.Forno.name())
 		)
 		{
+
+	 */
+		if(!deny){
 			
 			obj.result=this.controllerRestaurant.hasItem(obj.orderID,obj.itemLineNumber);
 			if(obj.result.equals(returnCodes.itemFound.name())) {
@@ -510,12 +518,12 @@ public class SystemController  extends GeneralController implements controllerIf
 	 *				}
 	 */
 	@Override
-	public void orderRequest(String request) {
+	public void orderRequest(String request, boolean deny) {
 		Gson gson=new Gson();
 		orderRequest obj=gson.fromJson(request, orderRequest.class);
 		
 		usersController.login(obj.user);
-		if(this.usersController.checkRole(
+	/*	if(this.usersController.checkRole(
 				obj.user
 				,UsersData.User.userRoles.Bar.name() )
 				||this.usersController.checkRole(
@@ -527,6 +535,8 @@ public class SystemController  extends GeneralController implements controllerIf
 				)
 			)
 		{
+
+	 */ if(!deny){
 			if(obj.areaVisualization)
 				obj.response=this.controllerRestaurant.getOrdersJSON(
 						Optional.of(obj.area));
@@ -567,19 +577,30 @@ public class SystemController  extends GeneralController implements controllerIf
 	@Override
 	public void loginRequest(String request) {
 		// TODO Auto-generated method stub
+		List<String>roles = new ArrayList<>();
+		String token = null;
 		Gson gson=new Gson();
 		loginRequest obj = gson.fromJson(request, loginRequest.class);
 		List<loginRequest> notifications=new ArrayList<>();
-		List<String>roles = this.usersController.loginFirstTime(obj.user, obj.password);
-		JsonArray array=new JsonArray();
-		for(String role : roles) {
-			notifications.add(generateRegisterNotification(obj.user,obj.url,role));
-			array.add(role);
+		try {
+			token = this.usersController.loginFirstTime(obj.user, obj.password);
+			roles = this.usersController.getRolesByAccessToken(token);
+			JsonArray array=new JsonArray();
+			for(String role : roles) {
+				notifications.add(generateRegisterNotification(obj.user,obj.url,role,token));
+				array.add(role);
+			}
+			obj.response=array.toString();
+
+		} catch (HttpResponseException e){
+			obj.response = e.getStatusCode()+"";
+			this.brokerIface.publishResponse(gson.toJson(obj,loginRequest.class));
+		} finally {
+			obj.access_token = token;
 		}
-		obj.response=array.toString();
-		
+
 		//publish the login Request
-		this.brokerIface.publishResponse(gson.toJson(obj,loginRequest.class));
+
 
 		//Publish the Register Notifications
 		for(loginRequest notification:notifications) 
@@ -644,12 +665,16 @@ public class SystemController  extends GeneralController implements controllerIf
 	 * @return the RegisterNotification message
 	 */
 	private loginRequest generateRegisterNotification(String user,
-			String url,String role) {
+			String url,String role, String access_token) {
 		loginRequest toRet =new loginRequest();
 		toRet.user=user;
 		toRet.url=url;
 		toRet.result=role;
+		toRet.response="200";
+		toRet.access_token = access_token;
 		toRet.messageName="registerNotification";
 		return toRet;
 	}
+
+
 }

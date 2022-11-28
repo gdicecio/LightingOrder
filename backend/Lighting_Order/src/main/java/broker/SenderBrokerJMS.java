@@ -35,6 +35,8 @@ public class SenderBrokerJMS {
         
         //@Value("CodaAccoglienzaBroker")
         private static final String acceptanceQueueBroker="CodaAccoglienzaBroker";
+
+		private static final String loginQueueBroker="CodaLoginBroker";
         
         //given a role obtain the queue
         private  final Map<String,String> roleToQueueMap=this.init_map();
@@ -142,7 +144,7 @@ public class SenderBrokerJMS {
     	 *  Inoltra la risposta al proxy login
     	 */
     	public void sendLoginInfo(String message) {
-    		//Empty
+			this.send(this.loginQueueBroker, message);
     	}
     	
     	/*
@@ -151,8 +153,10 @@ public class SenderBrokerJMS {
     	public void sendRegisterNotification(String message) {
     		Gson gson=new Gson();		
 			loginRequest not=gson.fromJson(message, loginRequest.class);
-			if(this.roleToQueueMap.containsKey(not.result))
+			if(this.roleToQueueMap.containsKey(not.result)) {
+				not.response="200";
 				this.send(this.roleToQueueMap.get(not.result), message);
+			}
     	}
     	
     	/*

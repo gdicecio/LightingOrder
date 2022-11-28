@@ -19,8 +19,7 @@ public class StdTerms {
     // ================================ NETWORK ================================
     public static final boolean manual_ip_address = false;
     public static final String ipAddress = "192.168.43.1";
-    public static final String proxyLoginAddress = "192.168.1.104:8085/loginSend";
-   // public static final String proxyLoginAddress = "192.168.1.115:8085/loginSend";
+    public static final String proxyLoginAddress = "192.168.1.109:8085/loginSend";
     public static final int server_port = 5000;
 
     // ================================ AUTHENTICATION ================================

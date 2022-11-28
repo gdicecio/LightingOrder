@@ -18,7 +18,7 @@ public class Post {
         HttpHeaders headers = new HttpHeaders();
 
         // set `content-type` header
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setContentType(MediaType.TEXT_PLAIN);
 
         // build the request
         HttpEntity<String> entity = new HttpEntity<>(message, headers);
