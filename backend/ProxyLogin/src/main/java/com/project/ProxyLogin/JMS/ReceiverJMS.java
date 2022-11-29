@@ -6,7 +6,6 @@ import com.project.ProxyLogin.web.Post;
 import com.project.ProxyLogin.web.Webhook;
 import com.project.ProxyLogin.web.baseMessage;
 import com.project.ProxyLogin.web.loginRequest;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.validation.constraints.NotNull;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

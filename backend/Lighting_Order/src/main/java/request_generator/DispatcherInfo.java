@@ -35,7 +35,6 @@ public class DispatcherInfo {
 
 		if(rec.messageName!=null) {
 			if (rec.messageName.equals(controllerIface.requests.tableRequest.name())) {
-
 				deny = permissionResource(rec.access_token, "api/tableRequest");
 				controllerFunctions.tableRequest(mex, deny);
 			} else if (rec.messageName.equals(controllerIface.requests.userWaitingForOrderRequest.name())) {
@@ -64,12 +63,11 @@ public class DispatcherInfo {
 				controllerFunctions.cancelOrderRequest(mex, deny);
 			} else if (rec.messageName.equals(controllerIface.requests.cancelOrderedItemRequest.name()))
 				deny = permissionResource(rec.access_token, "api/cancelOrderedItemRequest");
-			controllerFunctions.cancelOrderedItemRequest(mex, deny);
+				controllerFunctions.cancelOrderedItemRequest(mex, deny);
+			}else if(rec.messageName.equals(controllerIface.requests.loginRequest.name()))
+				controllerFunctions.loginRequest(mex);
 		}
-		else if(rec.messageName.equals(controllerIface.requests.loginRequest.name()))
-			controllerFunctions.loginRequest(mex);
 
-	}
 
 
 	private boolean permissionResource(String token, String resource){

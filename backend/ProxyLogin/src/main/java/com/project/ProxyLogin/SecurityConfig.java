@@ -7,9 +7,9 @@ import javax.net.ssl.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-@Configuration
+//@Configuration
 public class SecurityConfig {
-
+/*
     @Bean
     public Boolean disableSSLValidation() throws Exception {
         final SSLContext sslContext = SSLContext.getInstance("TLS");
@@ -38,5 +38,5 @@ public class SecurityConfig {
             }
         });
         return true;
-    }
+    }*/
 }
