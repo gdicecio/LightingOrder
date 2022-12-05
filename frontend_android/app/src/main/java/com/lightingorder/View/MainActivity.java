@@ -29,7 +29,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText ed_user_id, ed_user_password;
+    EditText ed_user_id, ed_user_password, proxy;
     Button b_login;
     private UserSessionController user_contr = new UserSessionController();
     private AlertDialog.Builder dialogBuilder;
@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ed_user_id = (EditText) findViewById(R.id.user_id);
         ed_user_password = (EditText) findViewById(R.id.user_password);
+        proxy = (EditText) findViewById(R.id.proxy);
         b_login = (Button) findViewById(R.id.login);
         ConnectivityController.getConnectivity().configPostMapping();
         ConnectivityController.getConnectivity().startServer();
@@ -58,11 +59,12 @@ public class MainActivity extends AppCompatActivity {
         } else
             ipAddress = StdTerms.ipAddress;
 
+        String proxyLoginAddress = proxy.getText().toString() + ":" + StdTerms.proxyLoginPort + StdTerms.proxyLoginPath;
         Log.d("myIP", ipAddress);
-        Log.d("loginIP", StdTerms.proxyLoginAddress);
+        Log.d("loginIP", proxyLoginAddress);
         user_contr.setUserIpAddress(ipAddress+":"+(StdTerms.server_port));
 
-        HttpResponse res = ConnectivityController.sendLoginRequest(user_contr, ed_user_password.getText().toString());
+        HttpResponse res = ConnectivityController.sendLoginRequest(user_contr, ed_user_password.getText().toString(), proxyLoginAddress);
         Log.d("ACTIVITY","MAIN ACTIVITY: Login request sent");
         Log.d("ACTIVITY:", "MAIN ACTIVITY: Login response: " + res.getCode() + res.getResult() );
 
@@ -126,6 +128,12 @@ public class MainActivity extends AppCompatActivity {
         AppStateController.getApplication().setCurrent_activity(this);
         Log.d("CURRENT_ACTIVITY",
                 "CURRENT ACTIVITY : "+AppStateController.getApplication().getCurrent_activity().getLocalClassName());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ConnectivityController.stopServer();
     }
 }
 

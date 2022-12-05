@@ -416,6 +416,10 @@ public class ConnectivityController {   //Singleton
         istanza.myserver.listen();
     }
 
+    public static void stopServer(){
+        istanza.myserver.onDestroy();
+    }
+
 
     //"192.168.43.16:8085/loginSend";
     static private HttpResponse sendPost(String body, String urlDestination){
@@ -431,7 +435,7 @@ public class ConnectivityController {   //Singleton
         HttpRequest req = new HttpRequest(address, port, "/"+path);
         req.setMethod("POST");
         req.setHeader("Content-Length", ""+body.length());
-        req.setHeader("Content-Type", "application/json");
+        req.setHeader("Content-Type", "text/plain");
         req.setHeader("User-Agent", "Android Frontend");
         req.setHeader("Accept", "*/*");
         req.setHeader("Connection", "keep-alive");
@@ -482,7 +486,7 @@ public class ConnectivityController {   //Singleton
         }
     }
 */
-    public static HttpResponse sendLoginRequest(UserSessionController us_contr, String password){
+    public static HttpResponse sendLoginRequest(UserSessionController us_contr, String password, String address){
         //Perchè non mettere la password nella struttura dati dell'utente?
         //La risposta è che la password deve solo inviata per l'accesso, non serve memorizzarla per tutta la sessione.
 
@@ -500,7 +504,7 @@ public class ConnectivityController {   //Singleton
         Gson gson = new Gson();
         String msg_body = gson.toJson(req_body);
         Log.d("Login", msg_body);
-        return ConnectivityController.sendPost(msg_body, StdTerms.proxyLoginAddress);
+        return ConnectivityController.sendPost(msg_body, address);
 
     }
 
@@ -677,8 +681,9 @@ public class ConnectivityController {   //Singleton
                 null,
                 orderID,
                 lineNumber);
-        String msg_body = gson.toJson(req_body);
+
         req_body.access_token = StdTerms.access_token;
+        String msg_body = gson.toJson(req_body);
         ConnectivityController.sendPost(msg_body,proxy_addr);
     }
 

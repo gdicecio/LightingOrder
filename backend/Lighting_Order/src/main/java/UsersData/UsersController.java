@@ -1,18 +1,27 @@
 package UsersData;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 import com.google.gson.Gson;
+import messages.KeyKeycloak;
 import messages.KeycloakToken.KeycloakToken;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.authorization.client.Configuration;
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.stereotype.Service;
 
 import DataAccess.UserDAOPSQL;
 import TableAndOrdersArea.Order;
+import org.springframework.vault.authentication.TokenAuthentication;
+import org.springframework.vault.client.VaultEndpoint;
+import org.springframework.vault.core.VaultTemplate;
+import org.springframework.vault.support.VaultResponseSupport;
+
 @Service
 public class UsersController {
 	
@@ -77,8 +86,23 @@ public class UsersController {
 
 	public String loginFirstTime(String id, String password){
 		List<String> roles = new ArrayList<>();
+
+		VaultTemplate template = null;
+		try {
+			template = new VaultTemplate(VaultEndpoint.from(new URI("http://127.0.0.1:8200")
+			), new TokenAuthentication("hvs.bLXKpXMba7g0IayOm6AbDbHX"));
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		VaultResponseSupport<KeyKeycloak> keycloak = template.read("kv/keycloak", KeyKeycloak.class);
+		Configuration config = new Configuration(keycloak.getData().getHost(),
+				keycloak.getData().getRealm(),
+				keycloak.getData().getClientId(),
+				keycloak.getData().getCredentials(),
+				null);
+		AuthzClient keycloak_client = AuthzClient.create(config);
+
 		//Accesso in keycloak
-		AuthzClient keycloak_client = AuthzClient.create();
 		AccessTokenResponse response = keycloak_client.obtainAccessToken(id,password);
 		return response.getToken();
 	}

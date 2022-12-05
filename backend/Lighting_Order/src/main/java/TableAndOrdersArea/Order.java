@@ -255,7 +255,7 @@ public class Order {
 			}
 		}
 		
-		if(helper.isEmpty()&&area.isPresent()) //if no items in the area with an area request
+		if(helper.isEmpty() &&area.isPresent()) //if no items in the area with an area request
 			return  "";
 		
 		Gson gson = new GsonBuilder()

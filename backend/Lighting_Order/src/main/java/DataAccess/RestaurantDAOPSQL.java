@@ -1,9 +1,12 @@
 package DataAccess;
 
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
+import messages.KeyAmazonDatabase;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,6 +17,10 @@ import org.springframework.stereotype.Repository;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.springframework.vault.authentication.TokenAuthentication;
+import org.springframework.vault.client.VaultEndpoint;
+import org.springframework.vault.core.VaultTemplate;
+import org.springframework.vault.support.VaultResponseSupport;
 
 @Repository("psqlRestaurant")
 public class RestaurantDAOPSQL implements RestaurantDAO {
@@ -21,11 +28,23 @@ public class RestaurantDAOPSQL implements RestaurantDAO {
 	private JdbcTemplate database;
     
     public RestaurantDAOPSQL() {
-    	DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(UserDAOPSQL.DRIVER);
-        dataSource.setUrl(UserDAOPSQL.JDBC_URL);
-        dataSource.setUsername(UserDAOPSQL.USERNAME);
-        dataSource.setPassword(UserDAOPSQL.PASSWORD);
+		VaultTemplate template = null;
+
+		//Connection Vault
+		try {
+			template = new VaultTemplate(VaultEndpoint.from(new URI("http://127.0.0.1:8200")
+			), new TokenAuthentication("hvs.bLXKpXMba7g0IayOm6AbDbHX"));
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		VaultResponseSupport<KeyAmazonDatabase> amazon = template.read("kv/amazon_database", KeyAmazonDatabase.class);
+		amazon.getData().setCertificatePath("C:/Users/giuse/Universita/SecureSystemDesign2022/Progetto/LightingOrder/certs/ca-central-1-bundle.pem");
+
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName(UserDAOPSQL.DRIVER);
+		dataSource.setUrl(amazon.getData().getUrl());
+		dataSource.setUsername(amazon.getData().getUsername());
+		dataSource.setPassword(amazon.getData().getPassword());
 		database = new JdbcTemplate(dataSource);
 	}
 	

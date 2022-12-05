@@ -16,8 +16,6 @@ import java.net.URISyntaxException;
 @SpringBootApplication
 public class ProxyLoginApplication {
 
-
-
 	public static void main(String[] args) {
 
 		VaultTemplate template = null;

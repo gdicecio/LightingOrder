@@ -1,15 +1,23 @@
 package DataAccess;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import messages.KeyAmazonDatabase;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Repository;
+import org.springframework.vault.authentication.TokenAuthentication;
+import org.springframework.vault.client.VaultEndpoint;
+import org.springframework.vault.core.VaultTemplate;
+import org.springframework.vault.support.VaultResponseSupport;
+
 @Repository("psqlUsers")
 public class UserDAOPSQL implements UsersDAO {
 	
@@ -17,24 +25,36 @@ public class UserDAOPSQL implements UsersDAO {
 	private JdbcTemplate database;
 
 	public static final String DRIVER = "org.postgresql.Driver";
-	/*
-	public static final String JDBC_URL = "jdbc:postgresql://ssd-lightingorder1.cffteivxlgpu.eu-central-1.rds.amazonaws.com:5432/Ristorante1926?" +
+
+	public static final String JDBC_URL = "jdbc:postgresql://databaselightingorder.cffteivxlgpu.eu-central-1.rds.amazonaws.com:5432/Ristorante1926?" +
 			"sslmode=verify-full&" +
 			"sslrootcert=C:/Users/giuse/Universita/SecureSystemDesign2022/Progetto/LightingOrder/certs/ca-central-1-bundle.pem";
-	public static final String USERNAME = "Username...";
-	public static final String PASSWORD = "Password...";
-	*/
-	public static final String JDBC_URL = "jdbc:postgresql://localhost:5432/Ristorante";
+	public static final String USERNAME = "MasterRistorante";
+	public static final String PASSWORD = "yr7pEs7z7iYSPz3K";
 
-	public static final String USERNAME = "postgres";
-	public static final String PASSWORD = "giuseppe";
+	//public static final String JDBC_URL = "jdbc:postgresql://localhost:5432/Ristorante";
+
+	//public static final String USERNAME = "postgres";
+	//public static final String PASSWORD = "giuseppe";
 
 	public UserDAOPSQL() {
+		VaultTemplate template = null;
+
+		//Connection Vault
+		try {
+			template = new VaultTemplate(VaultEndpoint.from(new URI("http://127.0.0.1:8200")
+			), new TokenAuthentication("hvs.bLXKpXMba7g0IayOm6AbDbHX"));
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		VaultResponseSupport<KeyAmazonDatabase> amazon = template.read("kv/amazon_database", KeyAmazonDatabase.class);
+		amazon.getData().setCertificatePath("C:/Users/giuse/Universita/SecureSystemDesign2022/Progetto/LightingOrder/certs/ca-central-1-bundle.pem");
+
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(UserDAOPSQL.DRIVER);
-        dataSource.setUrl(UserDAOPSQL.JDBC_URL);
-        dataSource.setUsername(UserDAOPSQL.USERNAME);
-        dataSource.setPassword(UserDAOPSQL.PASSWORD);
+        dataSource.setUrl(amazon.getData().getUrl());
+        dataSource.setUsername(amazon.getData().getUsername());
+        dataSource.setPassword(amazon.getData().getPassword());
 		database = new JdbcTemplate(dataSource);
 	}
 

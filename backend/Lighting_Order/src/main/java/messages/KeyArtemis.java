@@ -1,4 +1,4 @@
-package com.project.ProxyLogin.web;
+package messages;
 
 import lombok.Data;
 @Data
