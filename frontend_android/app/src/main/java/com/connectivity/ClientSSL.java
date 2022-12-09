@@ -11,12 +11,14 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -29,33 +31,7 @@ public class ClientSSL {
     String certificate_name;
     ClientThread client;
     int timeout;
-    private String files_dir = "/data/user/0/com.example.server_https/files";
-
-    public ClientSSL() {
-        certificate_path = files_dir + "/my_certificate.crt"; //FOR LOCAL SERVER
-    //    certificate_path = files_dir + "/server.crt"; //FOR TOMCAT homework
-        try {
-            SSLSocketFactory sf = getSocketFactory();
-            socket = (SSLSocket) sf.createSocket();
-        } catch (Exception e) {
-            ConnectionErrors.hystory_errors.add(ConnectionErrors.Error.CreatingClientSocket.name());
-        }
-
-        client = new ClientThread(socket);
-    }
-
-    public ClientSSL(String certificate){
-        certificate_name = certificate;
-        certificate_path = files_dir + "/" +certificate;
-        try {
-            SSLSocketFactory sf = getSocketFactory();
-            socket = (SSLSocket) sf.createSocket();
-        } catch (Exception e) {
-            ConnectionErrors.hystory_errors.add(ConnectionErrors.Error.CreatingClientSocket.name());
-        }
-
-        client = new ClientThread(socket);
-    }
+    private String files_dir = "/data/data/com.lightingorder/files";
 
     public ClientSSL(String certificate, String directory){
         certificate_name = certificate;
@@ -100,20 +76,25 @@ public class ClientSSL {
             CertificateFactory cert_fac = CertificateFactory.getInstance("X.509");
             InputStream in = new FileInputStream(certificate_path);
             Certificate cert = cert_fac.generateCertificate(in);
-            KeyStore keyStore = null;
+            String path = "/data/data/com.lightingorder/files/certificate.p12";
 
-            /*Lo carico in KeyStore. KeyStore è una struttura dati capace di contenere chiavi, certificati, algoritmi ecc*/
-            keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            //KeyStore con il certificato del server
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null, null);
             keyStore.setCertificateEntry("server", cert);
-
-            /*TrustManager serve per fidarsi del certificato che si ottiene durante l'handshake*/
             TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             trustManagerFactory.init(keyStore);
 
+            //KeyStore con il certificato del client (app Android)
+            KeyStore ks = KeyStore.getInstance("PKCS12");
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
+            char[] passphrase = "1111".toCharArray();
+            ks.load(new FileInputStream(path), passphrase);
+            kmf.init(ks, passphrase);
 
+            //Inizializzazione di SSL con mutua autenticazione
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
+            sslContext.init(kmf.getKeyManagers(), trustManagerFactory.getTrustManagers(), null); //sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
 
             sf = (SSLSocketFactory) sslContext.getSocketFactory();
 
@@ -129,6 +110,8 @@ public class ClientSSL {
             ConnectionErrors.hystory_errors.add(ConnectionErrors.Error.OtherException.name());
         } catch (KeyManagementException e) {
             ConnectionErrors.hystory_errors.add(ConnectionErrors.Error.OtherException.name());
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
         }
 
         return sf;

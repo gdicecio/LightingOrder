@@ -5,19 +5,23 @@ import android.util.Log;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.BindException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.util.HashMap;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 
 public class ServerSSL {
 
@@ -93,7 +97,17 @@ public class ServerSSL {
 
             ks.load(new FileInputStream(cert), passphrase);
             kmf.init(ks, passphrase);
-            ctx.init(kmf.getKeyManagers(), null, null);
+
+            CertificateFactory cert_fac = CertificateFactory.getInstance("X.509");
+            InputStream in = new FileInputStream("/data/data/com.lightingorder/files/my_certificate.crt");
+            Certificate certificate = cert_fac.generateCertificate(in);
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("server", certificate);
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init(keyStore);
+
+            ctx.init(kmf.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
 
             ssf = ctx.getServerSocketFactory();
             Log.d("Server", "Certificate loaded!");

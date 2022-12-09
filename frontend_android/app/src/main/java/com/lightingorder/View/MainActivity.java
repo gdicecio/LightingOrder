@@ -50,7 +50,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendLogin(View view){
 
-        user_contr.setUserID(ed_user_id.getText().toString());
+        String username = ed_user_id.getText().toString();
+        String password = ed_user_password.getText().toString();
+
+        user_contr.setUserID(username);
         String ipAddress = null;
 
         if(!StdTerms.manual_ip_address) {
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("loginIP", proxyLoginAddress);
         user_contr.setUserIpAddress(ipAddress+":"+(StdTerms.server_port));
 
-        HttpResponse res = ConnectivityController.sendLoginRequest(user_contr, ed_user_password.getText().toString(), proxyLoginAddress);
+        HttpResponse res = ConnectivityController.sendLoginRequest(user_contr, password, proxyLoginAddress);
         Log.d("ACTIVITY","MAIN ACTIVITY: Login request sent");
         Log.d("ACTIVITY:", "MAIN ACTIVITY: Login response: " + res.getCode() + res.getResult() );
 
