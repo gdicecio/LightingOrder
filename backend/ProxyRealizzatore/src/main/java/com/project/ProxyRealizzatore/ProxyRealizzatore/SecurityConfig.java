@@ -17,7 +17,7 @@ public class SecurityConfig {
     @Bean
     public Boolean disableSSLValidation() throws Exception {
         final SSLContext sslContext = SSLContext.getInstance("TLS");
-        FileInputStream in = new FileInputStream("C:/Users/giuse/Universita/SecureSystemDesign2022/Progetto/LightingOrder/backend/ProxyRealizzatore/src/main/resources/temp.crt");
+        FileInputStream in = new FileInputStream("C:/Users/giuse/Universita/SecureSystemDesign2022/Progetto/LightingOrder/backend/ProxyRealizzatore/src/main/resources/client.crt");
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
         Certificate cert = certificateFactory.generateCertificate(in);
 

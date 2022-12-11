@@ -3,6 +3,8 @@ package com.connectivity;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.lightingorder.StdTerms;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,12 +31,15 @@ public class ClientSSL {
     SSLSocket socket;
     String certificate_path;
     String certificate_name;
+    String certificate_directory;
+    //String path = "/data/data/com.lightingorder/files/client.p12";
     ClientThread client;
     int timeout;
     private String files_dir = "/data/data/com.lightingorder/files";
 
     public ClientSSL(String certificate, String directory){
         certificate_name = certificate;
+        certificate_directory = directory;
         certificate_path = directory + "/" +certificate;
         try {
             SSLSocketFactory sf = getSocketFactory();
@@ -44,11 +49,6 @@ public class ClientSSL {
         }
 
         client = new ClientThread(socket);
-    }
-
-    public void setCertificateDir(String path){
-        this.files_dir = path;
-        this.certificate_path = this.files_dir + "/" + this.certificate_name;
     }
 
     public HttpResponse send(HttpRequest req)  {
@@ -76,7 +76,7 @@ public class ClientSSL {
             CertificateFactory cert_fac = CertificateFactory.getInstance("X.509");
             InputStream in = new FileInputStream(certificate_path);
             Certificate cert = cert_fac.generateCertificate(in);
-            String path = "/data/data/com.lightingorder/files/certificate.p12";
+
 
             //KeyStore con il certificato del server
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -89,7 +89,7 @@ public class ClientSSL {
             KeyStore ks = KeyStore.getInstance("PKCS12");
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
             char[] passphrase = "1111".toCharArray();
-            ks.load(new FileInputStream(path), passphrase);
+            ks.load(new FileInputStream(certificate_directory+"/"+ StdTerms.android_certificate), passphrase);
             kmf.init(ks, passphrase);
 
             //Inizializzazione di SSL con mutua autenticazione

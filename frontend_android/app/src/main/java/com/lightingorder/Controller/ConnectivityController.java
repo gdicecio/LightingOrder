@@ -45,8 +45,9 @@ import java.util.Locale;
 
 public class ConnectivityController {   //Singleton
     private static ConnectivityController istanza = null;
-    private final String path = "/data/data/com.lightingorder/files/certificate.p12";
-
+    //private final String path = "/data/data/com.lightingorder/files/certificate.p12";
+    //private final String path = "/data/data/com.lightingorder/files/client.p12";
+    private final String path = "/data/data/com.lightingorder/files/";
     private final ServerSSL myserver;
     private AlertDialog.Builder dialogBuilder;
     private AlertDialog dialog;
@@ -55,7 +56,7 @@ public class ConnectivityController {   //Singleton
     private Button chiudi;
 
     private ConnectivityController(){
-         myserver = new ServerSSL(StdTerms.server_port, path);
+         myserver = new ServerSSL(StdTerms.server_port, path+StdTerms.android_certificate);
     }
 
     public static synchronized ConnectivityController getConnectivity(){
@@ -423,7 +424,7 @@ public class ConnectivityController {   //Singleton
 
     //"192.168.43.16:8085/loginSend";
     static private HttpResponse sendPost(String body, String urlDestination){
-        ClientSSL client = new ClientSSL("my_certificate.crt", AppStateController.getApplication().getCurrent_activity().getFilesDir().toString());
+        ClientSSL client = new ClientSSL(StdTerms.proxy_certificate, AppStateController.getApplication().getCurrent_activity().getFilesDir().toString());
         client.setTimeout(5000);
         String address_and_port = urlDestination.split("/")[0];
         String path = urlDestination.split("/")[1];

@@ -99,7 +99,8 @@ public class ServerSSL {
             kmf.init(ks, passphrase);
 
             CertificateFactory cert_fac = CertificateFactory.getInstance("X.509");
-            InputStream in = new FileInputStream("/data/data/com.lightingorder/files/my_certificate.crt");
+            //InputStream in = new FileInputStream("/data/data/com.lightingorder/files/my_certificate.crt");
+            InputStream in = new FileInputStream("/data/data/com.lightingorder/files/server.crt");
             Certificate certificate = cert_fac.generateCertificate(in);
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null, null);
