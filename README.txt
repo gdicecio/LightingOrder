@@ -31,6 +31,7 @@ EXPORT DATABASE
 	I test devono andare TUTTI a buon fine altrimenti l'esecuzione non funziona.
 	I test si rivolgono solo ai dati sul database. Quindi assicurarsi che il DBMS sia in esecuzione (di base è sempre in esecuzione)
 
+--------------------------------------------------------- Artemis -----------------------------------------------------------
 - Scaricare ActiveMQ Artemis dal sito ufficiale:
 	https://activemq.apache.org/components/artemis/
 - Non c'è bisogno di installarlo, basta estrarre il file .zip
@@ -41,6 +42,20 @@ EXPORT DATABASE
 	./artemis run
 - Si può accedere alla configurazione dal browser all'indirizzo:
 	localhost:8161
+[Note] Quando si crea il broker, esso si riferisce sempre alla cartella di Artemis in cui si è lanciato il comando per crearlo.
+Se la cartella viene cancellata, o cambiata posizione, il broker non si avvia
+
+--------------------------------------------------------- Vault --------------------------------------------------------------
+- Scaricare Vault HashCorp dal sito ufficiale:
+	https://developer.hashicorp.com/vault/downloads?host=www.vaultproject.io
+- Installare e avviare Vault seguendo la guida:
+	https://developer.hashicorp.com/vault/tutorials/getting-started/getting-started-intro
+
+--------------------------------------------------------- KeyCloak -----------------------------------------------------------
+- Scaricare KeyCloak dal sito ufficiale:
+	https://www.keycloak.org/downloads
+- Il pacchetto .zip è già operativo 
+
 
 ========================================================== FRONTEND ==========================================================
 - Per il momento l'unico frontend un applicazione Android.
@@ -60,13 +75,19 @@ EXPORT DATABASE
 
 ========================================================== ESECUZIONE ==========================================================
 In ordine eseguire i seguenti passi (possono essere automazzati alla fine del progetto, lo abbiamo già fatto in SAD)
-1. Eseguire Artemis
-2. Eseguire tutto il lato server. Quindi:
+1. Eseguire Artemis dal Broker nel path bin/
+	.\artemis.exe run 
+2. Eseguire KeyCloak nel path /bin
+	.\kc.bat start-dev --http-port 9000
+3. Eseguire Vault dalla root directory
+	./vault server -config="config.hcl"
+	./vault operator unseal [Per tre volte inserendo le chiavi di installazione]
+4. Eseguire tutto il lato server. Quindi:
 	LightingOrder
 	ProxyLogin
 	ProxyAccoglienza
 	ProxyCameriere
 	ProxyRealizzatore
-3. Eseguire l'applicazione Android inserendo le credenziali di un generico utente (riferimento: Tabella "Dipendente" nel DB).
+3. Eseguire l'applicazione Android inserendo le credenziali di un generico utente (riferimento: Users di KeyCloak).
 
 TUTTI gli applicativi devono essere nella stessa rete locale!
