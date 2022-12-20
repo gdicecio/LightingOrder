@@ -3,19 +3,15 @@ package com.project.ProxyLogin;
 import com.google.gson.Gson;
 import com.project.ProxyLogin.JMS.SenderJMS;
 import com.project.ProxyLogin.web.Post;
-import com.project.ProxyLogin.web.loginRequest;
+import com.project.ProxyLogin.web.messages.loginRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.security.RolesAllowed;
+import java.io.FileNotFoundException;
 
 @Controller
 public class ProxyLoginController {
@@ -25,7 +21,8 @@ public class ProxyLoginController {
 
     private final Post poster = new Post();
 
-    private final Logger log = LoggerFactory.getLogger(com.project.ProxyLogin.ProxyLoginController.class);
+    private Logger log = LoggerFactory.getLogger(com.project.ProxyLogin.ProxyLoginController.class);
+    private Log l;
 
     @PostMapping(value = "/loginSend")
     public ResponseEntity<String> login (@RequestBody String Login_msg) {
@@ -34,12 +31,30 @@ public class ProxyLoginController {
             "url": 192.168.1.x:YYYY
         */
 
+
+
+        try {
+            l =Log.getInstance(this.getClass().getName(), "login");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         log.info("Login Request received :"+Login_msg);
+        l.info("login", "Richiesta ricevuta: " + Login_msg);
 
-        sender.sendMessage(Login_msg);  //Invio su CodaLogin
 
-        return new ResponseEntity<>("Request received", HttpStatus.OK);
+        Gson parser = new Gson();
+        loginRequest req = parser.fromJson(Login_msg, loginRequest.class);
+        boolean val = req.validate();
+
+        if(!val) {
+            sender.sendMessage(Login_msg);  //Invio su CodaLogin
+            l.info("login", "Richiesta inviata ad Artemis");
+            return new ResponseEntity<>("Request received", HttpStatus.OK);
+        }else {
+            l.info("login", "Richiesta corrotta. Possibile SQL Injection");
+            return new ResponseEntity<>("Request not computed", HttpStatus.BAD_REQUEST);
+        }
+
     }
-
 
 }

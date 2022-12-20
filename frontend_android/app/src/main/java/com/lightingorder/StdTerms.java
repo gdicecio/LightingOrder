@@ -17,8 +17,8 @@ public class StdTerms {
     public static final int purple = Color.rgb(102, 0, 204);
 
     // ================================ NETWORK ================================
-    public static final boolean manual_ip_address = true;
-    public static final String ipAddress = "10.8.0.6";
+    public static final boolean manual_ip_address = false;
+    public static final String ipAddress = "192.168.43.1";
     public static final String proxyLoginAddress = "192.168.123.16:8085/loginSend";
     public static final String proxyLoginPort = "8085";
     public static final String proxyLoginPath = "/loginSend";

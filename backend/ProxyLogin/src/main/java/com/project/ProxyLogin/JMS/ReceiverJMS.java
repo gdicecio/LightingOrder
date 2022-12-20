@@ -3,9 +3,7 @@ package com.project.ProxyLogin.JMS;
 import com.google.gson.Gson;
 
 import com.project.ProxyLogin.web.Post;
-import com.project.ProxyLogin.web.Webhook;
-import com.project.ProxyLogin.web.baseMessage;
-import com.project.ProxyLogin.web.loginRequest;
+import com.project.ProxyLogin.web.messages.loginRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,10 +17,6 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.validation.constraints.NotNull;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Map;
 
 
 /*

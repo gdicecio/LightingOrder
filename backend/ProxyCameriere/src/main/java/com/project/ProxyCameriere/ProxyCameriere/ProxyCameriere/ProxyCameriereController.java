@@ -1,6 +1,7 @@
 package com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere;
 
 
+import com.project.ProxyCameriere.ProxyCameriere.Log;
 import com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS.ReceiverJMS;
 import com.project.ProxyCameriere.ProxyCameriere.ProxyCameriere.JMS.SenderJMS;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import javax.annotation.security.RolesAllowed;
+import java.io.IOException;
 
 /*
  * 1) POST mapping /register -> Iscrizione dell'applicazione al webhook del proxy
@@ -31,6 +33,7 @@ public class ProxyCameriereController {
 
     private static final String name="waitersProxy";
     private final Logger log = LoggerFactory.getLogger(ProxyCameriereController.class);
+    private Log l;
 
     /*
      * Example needed format:
@@ -56,6 +59,13 @@ public class ProxyCameriereController {
 
     @PostMapping (value = "/waitersSend")
     public ResponseEntity<String> sendJMS (@RequestBody String event) {
+        try{
+            l = Log.getInstance(this.getClass().getName(), "cameriere");
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
+        l.info("sendJMS", "Richiesta ricevuta: " + event);
         sender.sendMessage(event);
         log.info(event);
         return new ResponseEntity<>("Event sent", HttpStatus.OK);

@@ -1,0 +1,15 @@
+[INFO] 12-18-2022 16:44:48 || com.project.ProxyLogin.ProxyLoginApplication.main() : Applicazione avviata
+[INFO] 12-18-2022 16:45:41 || com.project.ProxyLogin.ProxyLoginApplication.login() : Richiesta ricevuta: {"password":"giuseppe.","url":"192.168.1.101:5000","messageName":"loginRequest","proxySource":"","response":"","result":"","user":"1\u003d1"}
+[INFO] 12-18-2022 16:45:45 || com.project.ProxyLogin.ProxyLoginApplication.login() : Richiesta corrotta. Possibile SQL Injection
+[INFO] 12-18-2022 16:46:08 || com.project.ProxyLogin.ProxyLoginApplication.login() : Richiesta ricevuta: {"password":"giuseppe.","url":"192.168.1.101:5000","messageName":"loginRequest","proxySource":"","response":"","result":"","user":"1\u003d1"}
+[INFO] 12-18-2022 16:46:08 || com.project.ProxyLogin.ProxyLoginApplication.login() : Richiesta corrotta. Possibile SQL Injection
+[INFO] 12-18-2022 16:46:32 || com.project.ProxyLogin.ProxyLoginApplication.login() : Richiesta ricevuta: {"password":"giuseppe.","url":"192.168.1.101:5000","messageName":"loginRequest","proxySource":"","response":"","result":"","user":"gius or 1\u003d1"}
+[INFO] 12-18-2022 16:46:32 || com.project.ProxyLogin.ProxyLoginApplication.login() : Richiesta corrotta. Possibile SQL Injection
+[INFO] 12-18-2022 16:46:38 || com.project.ProxyLogin.ProxyLoginApplication.login() : Richiesta ricevuta: {"password":"giuseppe.","url":"192.168.1.101:5000","messageName":"loginRequest","proxySource":"","response":"","result":"","user":"gius or 1\u003d1"}
+[INFO] 12-18-2022 16:46:38 || com.project.ProxyLogin.ProxyLoginApplication.login() : Richiesta corrotta. Possibile SQL Injection
+[INFO] 12-18-2022 16:46:49 || com.project.ProxyLogin.ProxyLoginApplication.login() : Richiesta ricevuta: {"password":"giuseppe.","url":"192.168.1.101:5000","messageName":"loginRequest","proxySource":"","response":"","result":"","user":"1"}
+[INFO] 12-18-2022 16:46:49 || com.project.ProxyLogin.ProxyLoginApplication.login() : Richiesta corrotta. Possibile SQL Injection
+[INFO] 12-18-2022 16:46:56 || com.project.ProxyLogin.ProxyLoginApplication.login() : Richiesta ricevuta: {"password":"giuseppe","url":"192.168.1.101:5000","messageName":"loginRequest","proxySource":"","response":"","result":"","user":"1"}
+[INFO] 12-18-2022 16:46:56 || com.project.ProxyLogin.ProxyLoginApplication.login() : Richiesta inviata ad Artemis
+[INFO] 12-18-2022 16:56:32 || com.project.ProxyLogin.ProxyLoginApplication.main() : Applicazione avviata
+[INFO] 12-18-2022 16:56:47 || com.project.ProxyLogin.ProxyLoginApplication.login() : Richiesta ricevuta: {"password":"giuseppe","url":"192.168.1.101:5000","messageName":"loginRequest","proxySource":"","response":"","result":"","user":"gius\u003d"}
