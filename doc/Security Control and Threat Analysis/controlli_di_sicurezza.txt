@@ -1,9 +1,0 @@
-SC-7 		=> Gestione dei proxy
-AC-17 	=> VPN
-AC-6		=> Minimo privlegio per ogni utente
-SC-8		=> Comunicazione sicura
-AC-18		=> Accesso alla rete wireless
-AC-1 - AC-6    (da vedere)
-
-Autenticazione - Identificazione - Autorizzazione (?)
-Qualcosa sull'identificazione
